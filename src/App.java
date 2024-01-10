@@ -1,16 +1,14 @@
-import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import javax.swing.*;
 import java.awt.dnd.*;
+import java.util.List;
 import java.awt.image.*;
 import javax.imageio.ImageIO;
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.stream.IntStream;
-import java.awt.datatransfer.DataFlavor;
+import javax.swing.border.Border;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.border.Border;
+import java.awt.datatransfer.DataFlavor;
 
 public class App {
     private static JLabel originalImageLabel = new JLabel("Drag and drop image here...", SwingConstants.CENTER);
@@ -33,12 +31,16 @@ public class App {
         JFrame frame = new JFrame("Kernel image processor");
         frame.setLayout(new BorderLayout());
 
+        // create a black border that will be placed around images
+        Border black_border = BorderFactory.createLineBorder(Color.BLACK, 3);
+
+        // setup the label that will display the original image
         originalImageLabel = new JLabel() {
-            @Override
+            @Override // override the paintComponent method to display the scaled image
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (originalImage != null) {
-                    Image scaledImage = getScaledImage(originalImage, getWidth(), getHeight());
+                    Image scaledImage = ImageUtils.getScaledImage(originalImage, getWidth(), getHeight());
                     g.drawImage(scaledImage, 0, 0, this);
                 } else {
                     g.drawString("Drag and drop image here...", 10, 20);
@@ -46,18 +48,13 @@ public class App {
             }
         };
 
-        // create and apply a border around images
-        Border black_border = BorderFactory.createLineBorder(Color.BLACK, 3);
-
-        originalImageLabel.setBorder(black_border);
-        originalImageLabel.setHorizontalAlignment(JLabel.CENTER);
-
+        // setup the label that will display the processed image
         processedImageLabel = new JLabel() {
-            @Override
+            @Override // override the paintComponent method to display the scaled image
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (processedImage != null) {
-                    Image scaledImage = getScaledImage(processedImage, getWidth(), getHeight());
+                    Image scaledImage = ImageUtils.getScaledImage(processedImage, getWidth(), getHeight());
                     g.drawImage(scaledImage, 0, 0, this);
                 } else {
                     g.drawString("Result:", 10, 20);
@@ -65,10 +62,15 @@ public class App {
             }
         };
 
-        processedImageLabel.setBorder(black_border); // Set the same border as originalImageLabel
+        // set the border around two images and set them to be centered
+        originalImageLabel.setBorder(black_border);
+        processedImageLabel.setBorder(black_border);
+        originalImageLabel.setHorizontalAlignment(JLabel.CENTER);
         processedImageLabel.setHorizontalAlignment(JLabel.CENTER);
 
+        // setup the drag and drop functionality for the original image label
         new DropTarget(originalImageLabel, new DropTargetAdapter() {
+            @Override // override the drop method to load the image
             public void drop(DropTargetDropEvent dtde) {
                 try {
                     dtde.acceptDrop(DnDConstants.ACTION_COPY); // Accept the drop operation
@@ -97,7 +99,7 @@ public class App {
                 float[] data = KERNEL_BLUR;
                 Kernel kernel = new Kernel(5, 5, data);
 
-                processedImage = applyKernelSequential(originalImage, kernel);
+                processedImage = ImageProcessor.applyKernelSequential(originalImage, kernel);
                 processedImageLabel.repaint();
             }
         });
@@ -113,7 +115,7 @@ public class App {
                 float[] data = KERNEL_BLUR;
                 Kernel kernel = new Kernel(5, 5, data);
 
-                processedImage = applyKernelParallel(originalImage, kernel);
+                processedImage = ImageProcessor.applyKernelParallel(originalImage, kernel);
                 processedImageLabel.repaint();
             }
         });
@@ -185,129 +187,5 @@ public class App {
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-    }
-
-    /**
-     * Get a scaled version of the image.
-     * 
-     * @param srcImg       The image to scale
-     * @param targetWidth  The target width
-     * @param targetHeight The target height
-     * @return The scaled image
-     */
-    private static Image getScaledImage(Image srcImg, int targetWidth, int targetHeight) {
-        double ratio = Math.min(targetWidth / (double) srcImg.getWidth(null),
-                targetHeight / (double) srcImg.getHeight(null));
-
-        int width = (int) (srcImg.getWidth(null) * ratio);
-        int height = (int) (srcImg.getHeight(null) * ratio);
-
-        BufferedImage resizedImg = new BufferedImage(targetWidth, targetHeight, BufferedImage.TRANSLUCENT);
-        Graphics2D g2 = resizedImg.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.drawImage(srcImg, (targetWidth - width) / 2, (targetHeight - height) / 2, width, height, null);
-        g2.dispose();
-
-        return resizedImg;
-    }
-
-    /**
-     * Apply the kernel to the image.
-     * 
-     * @param image  The image to apply the kernel to
-     * @param kernel The kernel to apply
-     * @param result The image to store the result in
-     */
-    private static void applyKernel(BufferedImage image, Kernel kernel, BufferedImage result) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                applyKernelToPixel(image, kernel, result, x, y);
-            }
-        }
-    }
-
-    /**
-     * Apply the kernel to the image sequentially.
-     * 
-     * @param image  The image to apply the kernel to
-     * @param kernel The kernel to apply
-     * @return The image with the kernel applied
-     */
-    public static BufferedImage applyKernelSequential(BufferedImage image, Kernel kernel) {
-        BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-        applyKernel(image, kernel, result);
-        return result;
-    }
-
-    /**
-     * Apply the kernel to the image in parallel.
-     * 
-     * @param image  The image to apply the kernel to
-     * @param kernel The kernel to apply
-     * @return The image with the kernel applied
-     */
-    public static BufferedImage applyKernelParallel(BufferedImage image, Kernel kernel) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        BufferedImage result = new BufferedImage(width, height, image.getType());
-
-        try (ForkJoinPool pool = new ForkJoinPool()) {
-            pool.submit(() -> {
-                IntStream.range(0, height).parallel().forEach(y -> {
-                    for (int x = 0; x < width; x++) {
-                        applyKernelToPixel(image, kernel, result, x, y);
-                    }
-                });
-            }).join();
-        }
-
-        return result;
-    }
-
-    /**
-     * Apply the kernel to the pixel at position (x, y) in the image.
-     * 
-     * @param image  The image to apply the kernel to
-     * @param kernel The kernel to apply
-     * @param result The image to store the result in
-     * @param x      The x position of the pixel
-     * @param y      The y position of the pixel
-     */
-    private static void applyKernelToPixel(BufferedImage image, Kernel kernel, BufferedImage result, int x, int y) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        int kernelWidth = kernel.getWidth();
-        int kernelHeight = kernel.getHeight();
-        float[] kernelData = kernel.getKernelData(null);
-
-        float r = 0, g = 0, b = 0;
-        for (int ky = -kernelHeight / 2; ky <= kernelHeight / 2; ky++) { // For each kernel row
-            for (int kx = -kernelWidth / 2; kx <= kernelWidth / 2; kx++) { // For each kernel column
-
-                // Calculate the adjacent pixel's position
-                int pixelX = Math.min(Math.max(x + kx, 0), width - 1);
-                int pixelY = Math.min(Math.max(y + ky, 0), height - 1);
-
-                Color pixelColor = new Color(image.getRGB(pixelX, pixelY)); // Get the adjacent pixel's color
-
-                // Get the kernel value
-                float kernelValue = kernelData[(ky + kernelHeight / 2) * kernelWidth + (kx + kernelWidth / 2)];
-
-                // Multiply the pixel's color with the kernel value
-                r += pixelColor.getRed() * kernelValue;
-                g += pixelColor.getGreen() * kernelValue; // Multiply the pixel's color with the kernel value
-                b += pixelColor.getBlue() * kernelValue; // Multiply the pixel's color with the kernel value
-            }
-        }
-        int newR = Math.min(Math.max((int) r, 0), 255);
-        int newG = Math.min(Math.max((int) g, 0), 255);
-        int newB = Math.min(Math.max((int) b, 0), 255);
-        // Set the pixel to the new color
-        Color newColor = new Color(newR, newG, newB);
-        result.setRGB(x, y, newColor.getRGB());
     }
 }

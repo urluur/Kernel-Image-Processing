@@ -16,6 +16,9 @@ public class App {
     private static JButton sequentialButton = new JButton("Sequential");
     private static JButton parallelButton = new JButton("Parallel");
 
+    private static JLabel sequentialTimeLabel = new JLabel("Sequential time: 0 ms");
+    private static JLabel parallelTimeLabel = new JLabel("Parallel time: 0 ms");
+
     private static final float[] KERNEL_BLUR = {
             1f / 25f, 1f / 25f, 1f / 25f, 1f / 25f, 1f / 25f,
             1f / 25f, 1f / 25f, 1f / 25f, 1f / 25f, 1f / 25f,
@@ -68,6 +71,12 @@ public class App {
         originalImageLabel.setHorizontalAlignment(JLabel.CENTER);
         processedImageLabel.setHorizontalAlignment(JLabel.CENTER);
 
+        JPanel resultsPanel = new JPanel();
+        resultsPanel.setLayout(new BoxLayout(resultsPanel, BoxLayout.Y_AXIS));
+
+        resultsPanel.add(sequentialTimeLabel);
+        resultsPanel.add(parallelTimeLabel);
+
         // setup the drag and drop functionality for the original image label
         new DropTarget(originalImageLabel, new DropTargetAdapter() {
             @Override // override the drop method to load the image
@@ -82,6 +91,12 @@ public class App {
                     originalImage = ImageIO.read(file);
 
                     originalImageLabel.repaint(); // Repaint the label to update the image
+
+                    sequentialTimeLabel.setText("Sequential time: 0 ms");
+                    parallelTimeLabel.setText("Parallel time: 0 ms");
+
+                    processedImage = null;
+                    processedImageLabel.repaint();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -99,7 +114,11 @@ public class App {
                 float[] data = KERNEL_BLUR;
                 Kernel kernel = new Kernel(5, 5, data);
 
+                long startTime = System.currentTimeMillis();
                 processedImage = ImageProcessor.applyKernelSequential(originalImage, kernel);
+                long endTime = System.currentTimeMillis();
+                sequentialTimeLabel.setText("Sequential time: " + (endTime - startTime) + " ms");
+
                 processedImageLabel.repaint();
             }
         });
@@ -115,7 +134,11 @@ public class App {
                 float[] data = KERNEL_BLUR;
                 Kernel kernel = new Kernel(5, 5, data);
 
+                long startTime = System.currentTimeMillis();
                 processedImage = ImageProcessor.applyKernelParallel(originalImage, kernel);
+                long endTime = System.currentTimeMillis();
+                parallelTimeLabel.setText("Parallel time: " + (endTime - startTime) + " ms");
+
                 processedImageLabel.repaint();
             }
         });
@@ -136,6 +159,10 @@ public class App {
                 // Clear the labels
                 originalImageLabel.setIcon(null);
                 processedImageLabel.setIcon(null);
+
+                sequentialTimeLabel.setText("Sequential time: 0 ms");
+                parallelTimeLabel.setText("Parallel time: 0 ms");
+
                 // Repaint the labels to update the display
                 originalImageLabel.repaint();
                 processedImageLabel.repaint();
@@ -163,6 +190,7 @@ public class App {
         buttonPanel.add(Box.createVerticalGlue());
         buttonPanel.add(sequentialButton);
         buttonPanel.add(parallelButton);
+        buttonPanel.add(resultsPanel);
         buttonPanel.add(Box.createVerticalGlue());
 
         // Add buttonPanel

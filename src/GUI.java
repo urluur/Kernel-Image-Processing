@@ -2,6 +2,7 @@ import java.awt.*;
 import java.io.File;
 import javax.swing.*;
 import java.awt.dnd.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.awt.image.*;
@@ -25,9 +26,11 @@ public class GUI {
   private Map<String, Kernel> kernels;
   private static Kernel selectedKernel;
 
+  JComboBox<String> demoImagesComboBox;
+
   public GUI(Map<String, Kernel> kernels) {
     this.kernels = kernels;
-    selectedKernel = this.kernels.get("Edge Detection");
+    selectedKernel = this.kernels.get("Blur");
   }
 
   public void setupUI(JFrame frame) {
@@ -93,6 +96,8 @@ public class GUI {
 
           processedImage = null;
           processedImageLabel.repaint();
+
+          demoImagesComboBox.setSelectedIndex(0);
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -140,7 +145,6 @@ public class GUI {
     sequentialButton.setPreferredSize(buttonSize);
     parallelButton.setPreferredSize(buttonSize);
 
-    // Set up ActionListener for Reset button
     JButton resetButton = new JButton("Reset");
     resetButton.setPreferredSize(new Dimension(80, 30));
     resetButton.addActionListener(new ActionListener() {
@@ -156,12 +160,49 @@ public class GUI {
 
         originalImageLabel.repaint();
         processedImageLabel.repaint();
+
+        demoImagesComboBox.setSelectedIndex(0);
+      }
+    });
+
+    // Get the images
+    File imgDir = new File("img");
+    File[] imgFiles = imgDir
+        .listFiles((dir, name) -> name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".jpg"));
+
+    // create a dropdown with images
+    String[] imgFileNames = Arrays.stream(imgFiles).map(File::getName).toArray(String[]::new);
+    demoImagesComboBox = new JComboBox<>(imgFileNames);
+
+    demoImagesComboBox.insertItemAt("-- Demo images --", 0);
+    demoImagesComboBox.setSelectedIndex(0);
+
+    demoImagesComboBox.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String selectedImageFileName = (String) demoImagesComboBox.getSelectedItem();
+        if (!selectedImageFileName.equals("Demo images")) {
+          try {
+            File selectedImageFile = new File(imgDir, selectedImageFileName);
+            originalImage = ImageIO.read(selectedImageFile);
+
+            originalImageLabel.repaint();
+            sequentialTimeLabel.setText("Sequential time: 0 ms");
+            parallelTimeLabel.setText("Parallel time: 0 ms");
+
+            processedImage = null;
+            processedImageLabel.repaint();
+          } catch (Exception ex) {
+            ex.printStackTrace();
+          }
+        }
       }
     });
 
     // Set up layout for top panel
     JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     topPanel.add(resetButton);
+    topPanel.add(demoImagesComboBox);
 
     frame.add(topPanel, BorderLayout.NORTH);
 

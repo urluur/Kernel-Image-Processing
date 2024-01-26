@@ -15,9 +15,9 @@ public class App {
   });
 
   private static final Kernel KERNEL_EDGE_DETECTION = new Kernel(3, 3, new float[] {
-      1, 0, -1,
-      0, 0, 0,
-      -1, 0, 1
+      -1, -1, -1,
+      -1, 8, -1,
+      -1, -1, -1
   });
 
   private static final Kernel KERNEL_EDGE_DETECTION_2 = new Kernel(3, 3, new float[] {

@@ -30,18 +30,18 @@ public class GUI {
 
   public GUI(Map<String, Kernel> kernels) {
     this.kernels = kernels;
-    selectedKernel = this.kernels.get("Blur");
+    selectedKernel = this.kernels.get("Edge Detection");
   }
 
   public void setupUI(JFrame frame) {
     frame.setLayout(new BorderLayout());
 
-    Border black_border = BorderFactory.createLineBorder(Color.BLACK, 3);
+    Border black_border = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2);
 
     originalImageLabel = new JLabel("Drag and drop image here...", SwingConstants.CENTER);
     processedImageLabel = new JLabel("Result:", SwingConstants.CENTER);
-    sequentialButton = new JButton("Sequential");
-    parallelButton = new JButton("Parallel");
+    sequentialButton = new JButton("Sequential →");
+    parallelButton = new JButton("Parallel →");
     sequentialTimeLabel = new JLabel("Sequential time: 0 ms");
     parallelTimeLabel = new JLabel("Parallel time: 0 ms");
 
@@ -88,16 +88,38 @@ public class GUI {
           List<File> files = (List<File>) dtde.getTransferable()
               .getTransferData(DataFlavor.javaFileListFlavor);
           File file = files.get(0);
-          originalImage = ImageIO.read(file);
 
-          originalImageLabel.repaint();
-          sequentialTimeLabel.setText("Sequential time: 0 ms");
-          parallelTimeLabel.setText("Parallel time: 0 ms");
+          CustomDialog loading = new CustomDialog(frame, "Loading...");
 
-          processedImage = null;
-          processedImageLabel.repaint();
+          SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
+            @Override
+            protected BufferedImage doInBackground() throws Exception {
+              return ImageIO.read(file);
+            }
 
-          demoImagesComboBox.setSelectedIndex(0);
+            @Override
+            protected void done() {
+              try {
+                originalImage = get();
+
+                originalImageLabel.repaint();
+                sequentialTimeLabel.setText("Sequential time: 0 ms");
+                parallelTimeLabel.setText("Parallel time: 0 ms");
+
+                processedImage = null;
+                processedImageLabel.repaint();
+
+                demoImagesComboBox.setSelectedIndex(0);
+
+                loading.dispose();
+              } catch (Exception ex) {
+                ex.printStackTrace();
+              }
+            }
+          };
+
+          worker.execute();
+          loading.setVisible(true);
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -113,12 +135,32 @@ public class GUI {
           return;
         }
 
-        long startTime = System.currentTimeMillis();
-        processedImage = ImageProcessor.applyKernelSequential(originalImage, selectedKernel);
-        long endTime = System.currentTimeMillis();
-        sequentialTimeLabel.setText("Sequential time: " + (endTime - startTime) + " ms");
+        CustomDialog processing = new CustomDialog(frame, "Processing...");
 
-        processedImageLabel.repaint();
+        SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
+          @Override
+          protected BufferedImage doInBackground() throws Exception {
+            long startTime = System.currentTimeMillis();
+            BufferedImage result = ImageProcessor.applyKernelSequential(originalImage, selectedKernel);
+            long endTime = System.currentTimeMillis();
+            sequentialTimeLabel.setText("Sequential time: " + (endTime - startTime) + " ms");
+            return result;
+          }
+
+          @Override
+          protected void done() {
+            try {
+              processedImage = get();
+              processedImageLabel.repaint();
+              processing.dispose();
+            } catch (Exception ex) {
+              ex.printStackTrace();
+            }
+          }
+        };
+
+        worker.execute();
+        processing.setVisible(true);
       }
     });
 
@@ -131,12 +173,32 @@ public class GUI {
           return;
         }
 
-        long startTime = System.currentTimeMillis();
-        processedImage = ImageProcessor.applyKernelParallel(originalImage, selectedKernel);
-        long endTime = System.currentTimeMillis();
-        parallelTimeLabel.setText("Parallel time: " + (endTime - startTime) + " ms");
+        CustomDialog processing = new CustomDialog(frame, "Processing...");
 
-        processedImageLabel.repaint();
+        SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
+          @Override
+          protected BufferedImage doInBackground() throws Exception {
+            long startTime = System.currentTimeMillis();
+            BufferedImage result = ImageProcessor.applyKernelParallel(originalImage, selectedKernel);
+            long endTime = System.currentTimeMillis();
+            parallelTimeLabel.setText("Parallel time: " + (endTime - startTime) + " ms");
+            return result;
+          }
+
+          @Override
+          protected void done() {
+            try {
+              processedImage = get();
+              processedImageLabel.repaint();
+              processing.dispose();
+            } catch (Exception ex) {
+              ex.printStackTrace();
+            }
+          }
+        };
+
+        worker.execute();
+        processing.setVisible(true);
       }
     });
 
@@ -181,20 +243,38 @@ public class GUI {
       @Override
       public void actionPerformed(ActionEvent e) {
         String selectedImageFileName = (String) demoImagesComboBox.getSelectedItem();
-        if (!selectedImageFileName.equals("Demo images")) {
-          try {
-            File selectedImageFile = new File(imgDir, selectedImageFileName);
-            originalImage = ImageIO.read(selectedImageFile);
+        if (!selectedImageFileName.equals("-- Demo images --")) {
 
-            originalImageLabel.repaint();
-            sequentialTimeLabel.setText("Sequential time: 0 ms");
-            parallelTimeLabel.setText("Parallel time: 0 ms");
+          CustomDialog loading = new CustomDialog(frame, "Loading...");
 
-            processedImage = null;
-            processedImageLabel.repaint();
-          } catch (Exception ex) {
-            ex.printStackTrace();
-          }
+          SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
+            @Override
+            protected BufferedImage doInBackground() throws Exception {
+              File selectedImageFile = new File(imgDir, selectedImageFileName);
+              return ImageIO.read(selectedImageFile);
+            }
+
+            @Override
+            protected void done() {
+              try {
+                originalImage = get();
+
+                originalImageLabel.repaint();
+                sequentialTimeLabel.setText("Sequential time: 0 ms");
+                parallelTimeLabel.setText("Parallel time: 0 ms");
+
+                processedImage = null;
+                processedImageLabel.repaint();
+
+                loading.dispose();
+              } catch (Exception ex) {
+                ex.printStackTrace();
+              }
+            }
+          };
+
+          worker.execute();
+          loading.setVisible(true);
         }
       }
     });
@@ -220,10 +300,19 @@ public class GUI {
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
     buttonPanel.add(Box.createVerticalGlue());
+
+    sequentialButton.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(sequentialButton);
+
+    parallelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(parallelButton);
+
+    sequentialTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(sequentialTimeLabel);
+
+    parallelTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(parallelTimeLabel);
+
     buttonPanel.add(Box.createVerticalGlue());
 
     gbc.gridx = 1;

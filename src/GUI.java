@@ -1,11 +1,11 @@
 import java.awt.*;
 import java.io.File;
 import javax.swing.*;
-import java.awt.dnd.*;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
+import java.awt.dnd.*;
+import java.util.List;
 import java.awt.image.*;
+import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.border.Border;
 import java.awt.event.ActionEvent;
@@ -15,6 +15,7 @@ import java.awt.datatransfer.DataFlavor;
 public class GUI {
   private JLabel originalImageLabel;
   private JLabel processedImageLabel;
+  private JLabel dimensionsLabel;
   private JButton sequentialButton;
   private JButton parallelButton;
   private JLabel sequentialTimeLabel;
@@ -41,8 +42,17 @@ public class GUI {
     processedImageLabel = new JLabel("Result:", SwingConstants.CENTER);
     sequentialButton = new JButton("Sequential →");
     parallelButton = new JButton("Parallel →");
-    sequentialTimeLabel = new JLabel("Sequential time: 0 ms");
-    parallelTimeLabel = new JLabel("Parallel time: 0 ms");
+    sequentialTimeLabel = new JLabel("Sequential: 0 ms");
+    parallelTimeLabel = new JLabel("Parallel: 0 ms");
+    dimensionsLabel = new JLabel();
+    updateDimensionsLabel();
+
+    // Create a border with padding
+    Border paddingBorder = BorderFactory.createEmptyBorder(5, 15, 0, 15);
+
+    // Add the border to the labels
+    sequentialTimeLabel.setBorder(paddingBorder);
+    parallelTimeLabel.setBorder(paddingBorder);
 
     // Override paintComponent for image labels
     originalImageLabel = new JLabel() {
@@ -88,7 +98,7 @@ public class GUI {
               .getTransferData(DataFlavor.javaFileListFlavor);
           File file = files.get(0);
 
-          CustomDialog loading = new CustomDialog(frame, "Loading...");
+          CustomDialog loading = new CustomDialog(frame, "Loading image...");
 
           SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
             @Override
@@ -100,10 +110,11 @@ public class GUI {
             protected void done() {
               try {
                 originalImage = get();
+                updateDimensionsLabel();
 
                 originalImageLabel.repaint();
-                sequentialTimeLabel.setText("Sequential time: 0 ms");
-                parallelTimeLabel.setText("Parallel time: 0 ms");
+                sequentialTimeLabel.setText("Sequential: 0 ms");
+                parallelTimeLabel.setText("Parallel: 0 ms");
 
                 processedImage = null;
                 processedImageLabel.repaint();
@@ -134,7 +145,7 @@ public class GUI {
           return;
         }
 
-        CustomDialog processing = new CustomDialog(frame, "Processing...");
+        CustomDialog processing = new CustomDialog(frame, "Processing image...");
 
         SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
           @Override
@@ -142,7 +153,7 @@ public class GUI {
             long startTime = System.currentTimeMillis();
             BufferedImage result = ImageProcessor.applyKernelSequential(originalImage, selectedKernel);
             long endTime = System.currentTimeMillis();
-            sequentialTimeLabel.setText("Sequential time: " + (endTime - startTime) + " ms");
+            sequentialTimeLabel.setText("Sequential: " + (endTime - startTime) + " ms");
             return result;
           }
 
@@ -172,7 +183,7 @@ public class GUI {
           return;
         }
 
-        CustomDialog processing = new CustomDialog(frame, "Processing...");
+        CustomDialog processing = new CustomDialog(frame, "Processing image...");
 
         SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
           @Override
@@ -180,7 +191,7 @@ public class GUI {
             long startTime = System.currentTimeMillis();
             BufferedImage result = ImageProcessor.applyKernelParallel(originalImage, selectedKernel);
             long endTime = System.currentTimeMillis();
-            parallelTimeLabel.setText("Parallel time: " + (endTime - startTime) + " ms");
+            parallelTimeLabel.setText("Parallel: " + (endTime - startTime) + " ms");
             return result;
           }
 
@@ -216,8 +227,8 @@ public class GUI {
         originalImageLabel.setIcon(null);
         processedImageLabel.setIcon(null);
 
-        sequentialTimeLabel.setText("Sequential time: 0 ms");
-        parallelTimeLabel.setText("Parallel time: 0 ms");
+        sequentialTimeLabel.setText("Sequential: 0 ms");
+        parallelTimeLabel.setText("Parallel: 0 ms");
 
         originalImageLabel.repaint();
         processedImageLabel.repaint();
@@ -244,7 +255,7 @@ public class GUI {
         String selectedImageFileName = (String) demoImagesComboBox.getSelectedItem();
         if (!selectedImageFileName.equals("-- Demo images --")) {
 
-          CustomDialog loading = new CustomDialog(frame, "Loading...");
+          CustomDialog loading = new CustomDialog(frame, "Loading image...");
 
           SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
             @Override
@@ -257,10 +268,11 @@ public class GUI {
             protected void done() {
               try {
                 originalImage = get();
+                updateDimensionsLabel();
 
                 originalImageLabel.repaint();
-                sequentialTimeLabel.setText("Sequential time: 0 ms");
-                parallelTimeLabel.setText("Parallel time: 0 ms");
+                sequentialTimeLabel.setText("Sequential: 0 ms");
+                parallelTimeLabel.setText("Parallel: 0 ms");
 
                 processedImage = null;
                 processedImageLabel.repaint();
@@ -290,11 +302,31 @@ public class GUI {
       }
     });
 
+    // Create a Save button
+    JButton saveButton = new JButton("Save");
+    saveButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        ImageUtils.saveImage(processedImage, frame);
+      }
+    });
+
     // Set up layout for top panel
-    JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    topPanel.add(resetButton);
-    topPanel.add(demoImagesComboBox);
-    topPanel.add(kernelsComboBox);
+    JPanel topPanel = new JPanel();
+    topPanel.setLayout(new BorderLayout());
+    JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+    leftPanel.add(resetButton);
+    leftPanel.add(demoImagesComboBox);
+    leftPanel.add(kernelsComboBox);
+
+    rightPanel.add(dimensionsLabel);
+    rightPanel.add(saveButton);
+
+    topPanel.add(leftPanel, BorderLayout.WEST);
+    topPanel.add(rightPanel, BorderLayout.EAST);
+
     frame.add(topPanel, BorderLayout.NORTH);
 
     // Set up layout for center panel
@@ -342,4 +374,13 @@ public class GUI {
 
     frame.add(centerPanel, BorderLayout.CENTER);
   }
+
+  private void updateDimensionsLabel() {
+    if (originalImage != null) {
+      dimensionsLabel.setText("Dimensions: " + originalImage.getWidth() + "x" + originalImage.getHeight());
+    } else {
+      dimensionsLabel.setText("Dimensions: 0x0");
+    }
+  }
+
 }

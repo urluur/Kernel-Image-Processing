@@ -1,8 +1,8 @@
 import java.awt.*;
 import javax.swing.*;
-import java.awt.image.Kernel;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import java.awt.image.Kernel;
 
 public class App {
 

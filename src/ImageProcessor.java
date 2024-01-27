@@ -1,8 +1,8 @@
 import java.awt.Color;
 import java.awt.image.Kernel;
-import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.ForkJoinPool;
 
 public class ImageProcessor {
 

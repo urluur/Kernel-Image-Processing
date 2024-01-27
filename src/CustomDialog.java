@@ -6,7 +6,7 @@ public class CustomDialog extends JDialog {
     JLabel loadingLabel = new JLabel(message, SwingConstants.CENTER);
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     setAlwaysOnTop(true);
-    setSize(100, 100);
+    setSize(175, 100);
     setResizable(false);
     setLocationRelativeTo(frame);
     add(loadingLabel);

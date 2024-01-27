@@ -24,10 +24,13 @@ This process can take a lot of time if done sequentially, so we can use parallel
 
 ## Usage
 
-- **Drag and drop** an image to the left panel or choose a sample image from the dropdown menu
+- **Drag and drop** an image to the left panel or choose a sample image from the `Demo images` dropdown menu
+- Choose the **Kernel** from the dropdown menu
 - Choose `Sequential` or `Parallel` button to start the processing of the image
 - Processed image will be visible on the right panel
 - The time it took to process the image will be displayed in the according label
+- You can **Save** the processed image by clicking the `Save` button on the top right corner
+- Click the `Reset` button or drag and drop a new image if you want to process another image
 
 ### To-do:
 

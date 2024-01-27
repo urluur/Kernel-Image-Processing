@@ -30,7 +30,6 @@ public class GUI {
 
   public GUI(Map<String, Kernel> kernels) {
     this.kernels = kernels;
-    selectedKernel = this.kernels.get("Edge Detection");
   }
 
   public void setupUI(JFrame frame) {
@@ -279,11 +278,23 @@ public class GUI {
       }
     });
 
+    String[] kernelNames = kernels.keySet().toArray(new String[0]); // get all kernels
+    JComboBox<String> kernelsComboBox = new JComboBox<>(kernelNames); // add to combobox
+    selectedKernel = kernels.get(kernelNames[0]); // set default kernel
+
+    kernelsComboBox.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String selectedKernelName = (String) kernelsComboBox.getSelectedItem();
+        selectedKernel = kernels.get(selectedKernelName);
+      }
+    });
+
     // Set up layout for top panel
     JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     topPanel.add(resetButton);
     topPanel.add(demoImagesComboBox);
-
+    topPanel.add(kernelsComboBox);
     frame.add(topPanel, BorderLayout.NORTH);
 
     // Set up layout for center panel

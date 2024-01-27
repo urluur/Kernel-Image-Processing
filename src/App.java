@@ -21,21 +21,15 @@ public class App {
   });
 
   private static final Kernel KERNEL_EDGE_DETECTION_2 = new Kernel(3, 3, new float[] {
-      -1, 0, -1,
+      -1, 0, 1,
       -2, 0, 2,
-      -1, 0, -1
+      -1, 0, 1
   });
 
   private static final Kernel KERNEL_SHARPEN = new Kernel(3, 3, new float[] {
       0, -1, 0,
       -1, 5, -1,
       0, -1, 0
-  });
-
-  private static final Kernel KERNEL_ADD_NOISE = new Kernel(3, 3, new float[] {
-      1f / 9f, 1f / 9f, 1f / 9f,
-      1f / 9f, 1f / 9f, 1f / 9f,
-      1f / 9f, 1f / 9f, 1f / 9f
   });
 
   private static final Kernel KERNEL_LAPLACIAN = new Kernel(3, 3, new float[] {
@@ -50,7 +44,6 @@ public class App {
       put("Edge Detection", KERNEL_EDGE_DETECTION);
       put("Sharpen", KERNEL_SHARPEN);
       put("Edge Detection 2", KERNEL_EDGE_DETECTION_2);
-      put("Add Noise", KERNEL_ADD_NOISE);
       put("Laplacian", KERNEL_LAPLACIAN);
     }
   };

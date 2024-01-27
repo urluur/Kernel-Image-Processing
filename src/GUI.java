@@ -145,7 +145,7 @@ public class GUI {
           return;
         }
 
-        CustomDialog processing = new CustomDialog(frame, "Processing image...");
+        CustomDialog processing = new CustomDialog(frame, "Processing image sequentially...");
 
         SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
           @Override
@@ -183,7 +183,7 @@ public class GUI {
           return;
         }
 
-        CustomDialog processing = new CustomDialog(frame, "Processing image...");
+        CustomDialog processing = new CustomDialog(frame, "Processing image in parallel...");
 
         SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
           @Override

@@ -20,7 +20,7 @@ The program is using a kernel, which is a small matrix that is applied to every 
 
 Photo by [Michael Plotke](https://commons.wikimedia.org/w/index.php?curid=24288958) - Own work, CC BY-SA 3.0
 
-This process can take a lot of time if doen sequentially, so we can use parallel processing to speed it up. The program measures the time it takes to process the image both sequentially and in parallel.
+This process can take a lot of time if done sequentially, so we can use parallel processing to speed it up. The program measures the time it takes to process the image both sequentially and in parallel.
 
 ## Usage
 
@@ -40,6 +40,6 @@ This process can take a lot of time if doen sequentially, so we can use parallel
 
 2. Problem specific implementation requirements
   - [x] There should be a default kernel supplied
-  - [ ] The implementation must adapt automatically to the hardware it is being ran on (Physical CPU's, Cores, Memory, etc..);
+  - [x] The implementation must adapt automatically to the hardware it is being ran on (Physical CPU's, Cores, Memory, etc..);
   - [x] The project must include a few sample images of different sizes.
   - [ ] The user should be able to specify the kernel and its size

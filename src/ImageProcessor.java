@@ -94,14 +94,15 @@ public class ImageProcessor {
     int height = image.getHeight();
     BufferedImage result = new BufferedImage(width, height, image.getType());
 
-    try (ForkJoinPool pool = new ForkJoinPool()) { // Create a fork join pool
-      pool.submit(() -> { // Submit a task to the pool
-        IntStream.range(0, height).parallel().forEach(y -> { // For each row in the image
-          for (int x = 0; x < width; x++) { // For each pixel in the row
-            applyKernelToPixel(image, kernel, result, x, y); // Apply the kernel to the pixel
-          }
+    // Create a ForkJoinPool that adapts to the number of available processors
+    try (ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors())) {
+      pool.submit(() -> {
+        IntStream.range(0, width * height).parallel().forEach(i -> { // for each pixel
+          int x = i % width;
+          int y = i / width;
+          applyKernelToPixel(image, kernel, result, x, y);
         });
-      }).join(); // Wait for the task to finish
+      }).join();
     }
 
     return result;

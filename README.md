@@ -6,7 +6,7 @@ This project is a part of the course [Programming III](https://prog3.student.fam
 
 It is a simple image processing program that uses a kernel to process the image. It is written in Java and uses [Swing](https://docs.oracle.com/javase/tutorial/uiswing/) for the GUI.
 
-![screenshot_cli](https://github.com/urluur/Kernel-Image-Processing/blob/main/img/screenshots/screenshot.jpg?raw=true)
+![screenshot_cli](https://github.com/urluur/Kernel-Image-Processing/blob/main/screenshots/screenshot.jpg?raw=true)
 
 ## Guidelines 
 

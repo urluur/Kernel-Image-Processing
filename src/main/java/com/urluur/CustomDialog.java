@@ -7,6 +7,12 @@ public class CustomDialog extends JDialog {
 
   private final int PADDING = 25;
 
+  /**
+   * Custom dialog to display a message
+   * 
+   * @param frame   parent frame
+   * @param message message to display
+   */
   public CustomDialog(JFrame frame, String message) {
     super(frame, "", true);
     JLabel loadingLabel = new JLabel(message, SwingConstants.CENTER);

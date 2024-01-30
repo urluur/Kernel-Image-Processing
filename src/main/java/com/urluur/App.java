@@ -55,8 +55,8 @@ public class App {
             JFrame frame = new JFrame("Kernel image processor");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            GUI gui = new GUI(KERNELS);
-            gui.setupUI(frame);
+            GUI gui = new GUI(frame, KERNELS);
+            gui.setupUI();
 
             frame.setPreferredSize(new Dimension(1200, 600));
             frame.pack();

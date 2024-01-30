@@ -19,42 +19,60 @@ import java.awt.event.ActionListener;
 import java.awt.datatransfer.DataFlavor;
 
 public class GUI {
-  private JLabel originalImageLabel;
-  private JLabel processedImageLabel;
+  private JLabel originalImageLabel, processedImageLabel;
   private JLabel dimensionsLabel;
-  private JButton sequentialButton;
-  private JButton parallelButton;
-  private JLabel sequentialTimeLabel;
-  private JLabel parallelTimeLabel;
+  private JLabel sequentialTimeLabel, parallelTimeLabel;
 
-  private BufferedImage originalImage;
-  private BufferedImage processedImage;
+  private JButton sequentialButton, parallelButton;
+  private JButton resetButton;
+  private JButton saveButton;
+
+  private BufferedImage originalImage, processedImage;
 
   private Map<String, Kernel> kernels;
   private static Kernel selectedKernel;
 
-  JComboBox<String> demoImagesComboBox;
+  private JFrame frame;
 
-  public GUI(Map<String, Kernel> kernels) {
+  private JComboBox<String> demoImagesComboBox;
+  private JComboBox<String> kernelsComboBox;
+
+  public GUI(JFrame frame, Map<String, Kernel> kernels) {
+    this.frame = frame;
     this.kernels = kernels;
   }
 
-  public void setupUI(JFrame frame) {
+  public void setupUI() {
     frame.setLayout(new BorderLayout());
+    setupImageLabels();
+    setupDragAndDrop();
+    setupButtons();
+    setupDemoImages();
+    setupKernels();
+    setupSaveButton();
+    setupPanels();
+  }
 
-    Border black_border = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2);
+  private void updateDimensionsLabel() {
+    if (originalImage != null) {
+      dimensionsLabel.setText("Dimensions: " + originalImage.getWidth() + "x" + originalImage.getHeight());
+    } else {
+      dimensionsLabel.setText("");
+    }
+  }
 
+  private void setupImageLabels() {
     originalImageLabel = new JLabel("Drag and drop image here...", SwingConstants.CENTER);
     processedImageLabel = new JLabel("Result:", SwingConstants.CENTER);
-    sequentialButton = new JButton("Sequential →");
-    parallelButton = new JButton("Parallel →");
     sequentialTimeLabel = new JLabel("Sequential: 0 ms");
     parallelTimeLabel = new JLabel("Parallel: 0 ms");
     dimensionsLabel = new JLabel();
+
     updateDimensionsLabel();
 
     // Create a border with padding
     Border paddingBorder = BorderFactory.createEmptyBorder(5, 15, 0, 15);
+    Border black_border = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2);
 
     // Add the border to the labels
     sequentialTimeLabel.setBorder(paddingBorder);
@@ -92,7 +110,9 @@ public class GUI {
     processedImageLabel.setBorder(black_border);
     originalImageLabel.setHorizontalAlignment(JLabel.CENTER);
     processedImageLabel.setHorizontalAlignment(JLabel.CENTER);
+  }
 
+  private void setupDragAndDrop() {
     // Set up drag and drop functionality
     new DropTarget(originalImageLabel, new DropTargetAdapter() {
       @Override
@@ -141,6 +161,11 @@ public class GUI {
         }
       }
     });
+  }
+
+  private void setupButtons() {
+    sequentialButton = new JButton("Sequential →");
+    parallelButton = new JButton("Parallel →");
 
     // Set up ActionListener for Sequential button
     sequentialButton.addActionListener(new ActionListener() {
@@ -223,7 +248,7 @@ public class GUI {
     sequentialButton.setPreferredSize(buttonSize);
     parallelButton.setPreferredSize(buttonSize);
 
-    JButton resetButton = new JButton("Reset");
+    resetButton = new JButton("Reset");
     resetButton.setPreferredSize(new Dimension(80, 30));
     resetButton.addActionListener(new ActionListener() {
       @Override
@@ -239,10 +264,14 @@ public class GUI {
         originalImageLabel.repaint();
         processedImageLabel.repaint();
 
+        updateDimensionsLabel();
+
         demoImagesComboBox.setSelectedIndex(0);
       }
     });
+  }
 
+  private void setupDemoImages() {
     // TODO: works in vscode, but not in jar
     try (InputStream in = getClass().getResourceAsStream("/img");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
@@ -303,32 +332,36 @@ public class GUI {
         }
       }
     });
+  }
 
+  private void setupKernels() {
     String[] kernelNames = kernels.keySet().toArray(new String[0]); // get all kernels
-    JComboBox<String> kernelsComboBox = new JComboBox<>(kernelNames); // add to combobox
+    kernelsComboBox = new JComboBox<>(kernelNames); // add to combobox
     selectedKernel = kernels.get(kernelNames[0]); // set default kernel
 
     kernelsComboBox.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         String selectedKernelName = (String) kernelsComboBox.getSelectedItem();
         selectedKernel = kernels.get(selectedKernelName);
       }
     });
+  }
 
+  private void setupSaveButton() {
     // Create a Save button
-    JButton saveButton = new JButton("Save");
+    saveButton = new JButton("Save");
     saveButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         ImageUtils.saveImage(processedImage, frame);
       }
     });
+  }
 
+  private void setupPanels() {
     // Set up layout for top panel
-    JPanel topPanel = new JPanel();
-    topPanel.setLayout(new BorderLayout());
+    JPanel topPanel = new JPanel(new BorderLayout());
     JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
@@ -344,7 +377,6 @@ public class GUI {
 
     frame.add(topPanel, BorderLayout.NORTH);
 
-    // Set up layout for center panel
     JPanel centerPanel = new JPanel(new GridBagLayout());
     GridBagConstraints gbc = new GridBagConstraints();
 
@@ -389,13 +421,4 @@ public class GUI {
 
     frame.add(centerPanel, BorderLayout.CENTER);
   }
-
-  private void updateDimensionsLabel() {
-    if (originalImage != null) {
-      dimensionsLabel.setText("Dimensions: " + originalImage.getWidth() + "x" + originalImage.getHeight());
-    } else {
-      dimensionsLabel.setText("Dimensions: 0x0");
-    }
-  }
-
 }

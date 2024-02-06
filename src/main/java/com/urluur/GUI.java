@@ -49,7 +49,6 @@ public class GUI {
     setupButtons();
     setupDemoImages();
     setupKernels();
-    setupSaveButton();
     setupPanels();
   }
 
@@ -269,6 +268,15 @@ public class GUI {
         demoImagesComboBox.setSelectedIndex(0);
       }
     });
+
+    // Create a Save button
+    saveButton = new JButton("Save");
+    saveButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        ImageUtils.saveImage(processedImage, frame);
+      }
+    });
   }
 
   private void setupDemoImages() {
@@ -344,17 +352,6 @@ public class GUI {
       public void actionPerformed(ActionEvent e) {
         String selectedKernelName = (String) kernelsComboBox.getSelectedItem();
         selectedKernel = kernels.get(selectedKernelName);
-      }
-    });
-  }
-
-  private void setupSaveButton() {
-    // Create a Save button
-    saveButton = new JButton("Save");
-    saveButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        ImageUtils.saveImage(processedImage, frame);
       }
     });
   }

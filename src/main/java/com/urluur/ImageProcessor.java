@@ -59,8 +59,8 @@ public class ImageProcessor {
 
         // Multiply the pixel's color with the kernel value
         r += pixelColor.getRed() * kernelValue;
-        g += pixelColor.getGreen() * kernelValue; // Multiply the pixel's color with the kernel value
-        b += pixelColor.getBlue() * kernelValue; // Multiply the pixel's color with the kernel value
+        g += pixelColor.getGreen() * kernelValue;
+        b += pixelColor.getBlue() * kernelValue;
       }
     }
     int newR = Math.min(Math.max((int) r, 0), 255);

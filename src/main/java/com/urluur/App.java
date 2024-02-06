@@ -40,6 +40,12 @@ public class App {
             0, 1, 0
     });
 
+    private static final Kernel KERNEL_EMBOSS = new Kernel(3, 3, new float[] {
+            -2, -1, 0,
+            -1, 1, 1,
+            0, 1, 2
+    });
+
     private static final Map<String, Kernel> KERNELS = new HashMap<String, Kernel>() {
         {
             put("Blur", KERNEL_BLUR);
@@ -47,6 +53,7 @@ public class App {
             put("Sharpen", KERNEL_SHARPEN);
             put("Edge Detection 2", KERNEL_EDGE_DETECTION_2);
             put("Laplacian", KERNEL_LAPLACIAN);
+            put("Emboss", KERNEL_EMBOSS);
         }
     };
 

@@ -32,7 +32,18 @@ This process can take a lot of time if done sequentially, so we can use parallel
 - You can **Save** the processed image by clicking the `Save` button on the top right corner
 - Click the `Reset` button or drag and drop a new image if you want to process another image
 
-### To-do:
+## Distributed computing setup
+
+1. Download MPJ Express v0.44 from [SourceForge](https://sourceforge.net/projects/mpjexpress/files/releases/mpj-v0_44.zip/download)
+2. Move to the project repository: `cd Kernel-Image-Processing/`
+2. Create libs folder: `mkdir libs`
+3. Move extracted folder to the libs folder
+4. Install MPJ Express as dependancy:
+    ```sh
+    mvn install:install-file -Dfile=libs/mpj-v0_44/lib/mpj.jar -DgroupId=com.googlecode.mpj-express -DartifactId=mpj-v0_44 -Dversion=0.44 -Dpackaging=jar
+    ```
+
+## To-do:
 
 1. Running the program:
   - [x] Sequential

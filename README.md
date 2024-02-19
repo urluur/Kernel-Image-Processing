@@ -18,7 +18,7 @@ The program is using a kernel, which is a small matrix that is applied to every 
 
 ![image](https://upload.wikimedia.org/wikipedia/commons/1/19/2D_Convolution_Animation.gif)
 
-Photo by [Michael Plotke](https://commons.wikimedia.org/w/index.php?curid=24288958) - Own work, CC BY-SA 3.0
+Photo by <a href="https://commons.wikimedia.org/wiki/File:2D_Convolution_Animation.gif">Michael Plotke</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a>, via Wikimedia Commons
 
 This process can take a lot of time if done sequentially, so we can use parallel processing to speed it up. The program measures the time it takes to process the image both sequentially and in parallel.
 

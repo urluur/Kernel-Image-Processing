@@ -21,9 +21,9 @@ import java.awt.datatransfer.DataFlavor;
 public class GUI {
   private JLabel originalImageLabel, processedImageLabel;
   private JLabel dimensionsLabel;
-  private JLabel sequentialTimeLabel, parallelTimeLabel;
+  private JLabel sequentialTimeLabel, parallelTimeLabel, distributedTimeLabel;
 
-  private JButton sequentialButton, parallelButton;
+  private JButton sequentialButton, parallelButton, distributedButton;
   private JButton resetButton;
   private JButton saveButton;
 
@@ -65,6 +65,7 @@ public class GUI {
     processedImageLabel = new JLabel("Result:", SwingConstants.CENTER);
     sequentialTimeLabel = new JLabel("Sequential: 0 ms");
     parallelTimeLabel = new JLabel("Parallel: 0 ms");
+    distributedTimeLabel = new JLabel("Distributed: 0 ms");
     dimensionsLabel = new JLabel();
 
     updateDimensionsLabel();
@@ -76,6 +77,7 @@ public class GUI {
     // Add the border to the labels
     sequentialTimeLabel.setBorder(paddingBorder);
     parallelTimeLabel.setBorder(paddingBorder);
+    distributedTimeLabel.setBorder(paddingBorder);
 
     // Override paintComponent for image labels
     originalImageLabel = new JLabel() {
@@ -140,6 +142,7 @@ public class GUI {
                 originalImageLabel.repaint();
                 sequentialTimeLabel.setText("Sequential: 0 ms");
                 parallelTimeLabel.setText("Parallel: 0 ms");
+                distributedTimeLabel.setText("Distributed: 0 ms");
 
                 processedImage = null;
                 processedImageLabel.repaint();
@@ -165,6 +168,8 @@ public class GUI {
   private void setupButtons() {
     sequentialButton = new JButton("Sequential →");
     parallelButton = new JButton("Parallel →");
+    distributedButton = new JButton("Distributed →");
+    distributedButton.setEnabled(false);
 
     // Set up ActionListener for Sequential button
     sequentialButton.addActionListener(new ActionListener() {
@@ -242,10 +247,48 @@ public class GUI {
       }
     });
 
+    distributedButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (originalImage == null) {
+          JOptionPane.showMessageDialog(frame, "No image loaded", "Error", JOptionPane.ERROR_MESSAGE);
+          return;
+        }
+
+        CustomDialog processing = new CustomDialog(frame, "Processing image in distributed mode...");
+
+        SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
+          @Override
+          protected BufferedImage doInBackground() throws Exception {
+            long startTime = System.currentTimeMillis();
+            BufferedImage result = Distributed.masterDistributed(originalImage, selectedKernel);
+            long endTime = System.currentTimeMillis();
+            distributedTimeLabel.setText("Distributed: " + (endTime - startTime) + " ms");
+            return result;
+          }
+
+          @Override
+          protected void done() {
+            try {
+              processedImage = get();
+              processedImageLabel.repaint();
+              processing.dispose();
+            } catch (Exception ex) {
+              ex.printStackTrace();
+            }
+          }
+        };
+
+        worker.execute();
+        processing.setVisible(true);
+      }
+    });
+
     // Set preferred size for buttons
     Dimension buttonSize = new Dimension(100, 40);
     sequentialButton.setPreferredSize(buttonSize);
     parallelButton.setPreferredSize(buttonSize);
+    distributedButton.setPreferredSize(buttonSize);
 
     resetButton = new JButton("Reset");
     resetButton.setPreferredSize(new Dimension(80, 30));
@@ -259,6 +302,7 @@ public class GUI {
 
         sequentialTimeLabel.setText("Sequential: 0 ms");
         parallelTimeLabel.setText("Parallel: 0 ms");
+        distributedTimeLabel.setText("Distributed: 0 ms");
 
         originalImageLabel.repaint();
         processedImageLabel.repaint();
@@ -324,6 +368,7 @@ public class GUI {
                 originalImageLabel.repaint();
                 sequentialTimeLabel.setText("Sequential: 0 ms");
                 parallelTimeLabel.setText("Parallel: 0 ms");
+                distributedTimeLabel.setText("Distributed: 0 ms");
 
                 processedImage = null;
                 processedImageLabel.repaint();
@@ -394,11 +439,17 @@ public class GUI {
     parallelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(parallelButton);
 
+    distributedButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+    buttonPanel.add(distributedButton);
+
     sequentialTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(sequentialTimeLabel);
 
     parallelTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(parallelTimeLabel);
+
+    distributedTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    buttonPanel.add(distributedTimeLabel);
 
     buttonPanel.add(Box.createVerticalGlue());
 

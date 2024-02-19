@@ -11,6 +11,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ImageUtils {
@@ -80,6 +82,18 @@ public class ImageUtils {
         ex.printStackTrace();
       }
     }
+  }
+
+  // source: https://mkyong.com/java/how-to-convert-bufferedimage-to-byte-in-java/
+  public static byte[] bufferedImageToByteArray(BufferedImage image, String format) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ImageIO.write(image, format, baos);
+    return baos.toByteArray();
+  }
+
+  public static BufferedImage byteArrayToBufferedImage(byte[] bytes) throws IOException {
+    ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+    return ImageIO.read(bais);
   }
 
 }

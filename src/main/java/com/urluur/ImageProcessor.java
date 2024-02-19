@@ -36,7 +36,7 @@ public class ImageProcessor {
    * @param x      The x position of the pixel
    * @param y      The y position of the pixel
    */
-  private static void applyKernelToPixel(BufferedImage image, Kernel kernel, BufferedImage result, int x, int y) {
+  public static void applyKernelToPixel(BufferedImage image, Kernel kernel, BufferedImage result, int x, int y) {
     int width = image.getWidth();
     int height = image.getHeight();
 

@@ -6,9 +6,23 @@ import javax.swing.*;
 import java.util.Map;
 import java.util.HashMap;
 import java.awt.image.Kernel;
+// import java.awt.event.WindowEvent;
+// import java.awt.event.WindowAdapter;
 
 public class App {
 
+  private static int rank;
+  private static int size;
+
+  public static int getRank() {
+    return rank;
+  }
+
+  public static int getSize() {
+    return size;
+  }
+
+  // kernels source: https://setosa.io/ev/image-kernels/
   private static final Map<String, Kernel> KERNELS = new HashMap<String, Kernel>() {
     {
       put("Blur", new Kernel(5, 5, new float[] {
@@ -46,6 +60,10 @@ public class App {
   };
 
   public static void main(String[] args) {
+    // MPI.Init(args);
+    // rank = MPI.COMM_WORLD.Rank();
+    // size = MPI.COMM_WORLD.Size();
+
     SwingUtilities.invokeLater(() -> {
       JFrame frame = new JFrame("Kernel image processor");
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,6 +74,12 @@ public class App {
       frame.setPreferredSize(new Dimension(1200, 600));
       frame.pack();
       frame.setVisible(true);
+
+      // frame.addWindowListener(new WindowAdapter() {
+      // public void windowClosing(WindowEvent e) {
+      // MPI.Finalize();
+      // }
+      // });
     });
   }
 }

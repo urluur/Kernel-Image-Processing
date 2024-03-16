@@ -391,12 +391,14 @@ public class GUI {
     String[] kernelNames = kernels.keySet().toArray(new String[0]); // get all kernels
     kernelsComboBox = new JComboBox<>(kernelNames); // add to combobox
     selectedKernel = kernels.get(kernelNames[0]); // set default kernel
+    displayKernel();
 
     kernelsComboBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         String selectedKernelName = (String) kernelsComboBox.getSelectedItem();
         selectedKernel = kernels.get(selectedKernelName);
+        displayKernel();
       }
     });
   }
@@ -468,5 +470,18 @@ public class GUI {
     centerPanel.add(processedImageLabel, gbc);
 
     frame.add(centerPanel, BorderLayout.CENTER);
+  }
+
+  private void displayKernel() {
+    float[] data = selectedKernel.getKernelData(null);
+    int width = selectedKernel.getWidth();
+
+    for (int i = 0; i < data.length; i++) {
+      if (i % width == 0) {
+        System.out.println();
+      }
+      System.out.print(data[i] + " ");
+    }
+    System.out.println();
   }
 }

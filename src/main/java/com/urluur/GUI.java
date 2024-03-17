@@ -23,6 +23,9 @@ public class GUI {
   private JLabel dimensionsLabel;
   private JLabel sequentialTimeLabel, parallelTimeLabel, distributedTimeLabel;
 
+  JPanel currentKernelPanel = new JPanel();
+  private boolean isCustomKernelEnabled = false;
+
   private JButton sequentialButton, parallelButton, distributedButton;
   private JButton resetButton;
   private JButton saveButton;
@@ -433,6 +436,8 @@ public class GUI {
 
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+
+    buttonPanel.add(currentKernelPanel);
     buttonPanel.add(Box.createVerticalGlue());
 
     sequentialButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -473,15 +478,36 @@ public class GUI {
   }
 
   private void displayKernel() {
+    currentKernelPanel.removeAll();
+    currentKernelPanel.setLayout(new BoxLayout(currentKernelPanel, BoxLayout.Y_AXIS));
+
     float[] data = selectedKernel.getKernelData(null);
     int width = selectedKernel.getWidth();
 
-    for (int i = 0; i < data.length; i++) {
-      if (i % width == 0) {
-        System.out.println();
-      }
-      System.out.print(data[i] + " ");
+    JPanel widthPanel = new JPanel();
+    widthPanel.setLayout(new BoxLayout(widthPanel, BoxLayout.X_AXIS));
+
+    JLabel widthLabel = new JLabel("Width: ");
+    widthPanel.add(widthLabel);
+
+    JTextField widthField = new JTextField(String.valueOf(width));
+    widthField.setEnabled(isCustomKernelEnabled);
+    widthField.setMaximumSize(widthField.getPreferredSize());
+    widthPanel.add(widthField);
+
+    currentKernelPanel.add(widthPanel);
+
+    JPanel kernelPanel = new JPanel(new GridLayout(0, width));
+
+    for (float value : data) {
+      JTextField field = new JTextField(String.valueOf(value));
+      field.setEnabled(isCustomKernelEnabled);
+      kernelPanel.add(field);
     }
-    System.out.println();
+
+    currentKernelPanel.add(kernelPanel);
+
+    currentKernelPanel.revalidate();
+    currentKernelPanel.repaint();
   }
 }

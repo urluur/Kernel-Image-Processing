@@ -57,4 +57,4 @@ This process can take a lot of time if done sequentially, so we can use parallel
   - [x] The implementation must adapt automatically to the hardware it is being ran on (Physical CPU's, Cores, Memory, etc..);
   - [x] The project must include a few sample images of different sizes.
   - [x] The user should be able to choose the kernel
-  - [ ] The user can set a custom kernel with a GUI
+  - [x] The user can set a custom kernel with a GUI

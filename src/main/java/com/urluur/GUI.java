@@ -7,12 +7,16 @@ import java.util.Map;
 import java.awt.dnd.*;
 import java.util.List;
 import java.awt.image.*;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 import java.io.BufferedReader;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.io.InputStreamReader;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -392,7 +396,10 @@ public class GUI {
 
   private void setupKernels() {
     String[] kernelNames = kernels.keySet().toArray(new String[0]); // get all kernels
-    kernelsComboBox = new JComboBox<>(kernelNames); // add to combobox
+    String[] kernelNamesWithCustom = Arrays.copyOf(kernelNames, kernelNames.length + 1);
+    kernelNamesWithCustom[kernelNames.length] = "Custom";
+
+    kernelsComboBox = new JComboBox<>(kernelNamesWithCustom); // add to combobox
     selectedKernel = kernels.get(kernelNames[0]); // set default kernel
     displayKernel();
 
@@ -400,7 +407,12 @@ public class GUI {
       @Override
       public void actionPerformed(ActionEvent e) {
         String selectedKernelName = (String) kernelsComboBox.getSelectedItem();
-        selectedKernel = kernels.get(selectedKernelName);
+        if ("Custom".equals(selectedKernelName)) {
+          isCustomKernelEnabled = true;
+        } else {
+          isCustomKernelEnabled = false;
+          selectedKernel = kernels.get(selectedKernelName);
+        }
         displayKernel();
       }
     });
@@ -490,19 +502,52 @@ public class GUI {
     JLabel widthLabel = new JLabel("Width: ");
     widthPanel.add(widthLabel);
 
-    JTextField widthField = new JTextField(String.valueOf(width));
-    widthField.setEnabled(isCustomKernelEnabled);
-    widthField.setMaximumSize(widthField.getPreferredSize());
-    widthPanel.add(widthField);
+    int validWidth = width % 2 == 0 ? width + 1 : width; // width of the kernel must be odd
+    SpinnerNumberModel widthModel = new SpinnerNumberModel(validWidth, 1, Integer.MAX_VALUE, 2);
+    JSpinner widthSpinner = new JSpinner(widthModel);
+    widthSpinner.setEnabled(isCustomKernelEnabled);
+    widthSpinner.setMaximumSize(widthSpinner.getPreferredSize());
+    widthSpinner.addChangeListener(new ChangeListener() {
+      @Override
+      public void stateChanged(ChangeEvent e) {
+        if (isCustomKernelEnabled) {
+          int newWidth = (Integer) widthSpinner.getValue();
+          float[] identityData = new float[newWidth * newWidth];
+          Arrays.fill(identityData, 0);
+          int center = newWidth / 2;
+          identityData[center * newWidth + center] = 1;
+          selectedKernel = new Kernel(newWidth, newWidth, identityData);
+          displayKernel();
+        }
+      }
+    });
+    widthPanel.add(widthSpinner);
 
     currentKernelPanel.add(widthPanel);
 
-    JPanel kernelPanel = new JPanel(new GridLayout(0, width));
+    JPanel kernelPanel = new JPanel(new GridLayout(0, validWidth));
+    List<JSpinner> valueSpinners = new ArrayList<>();
 
     for (float value : data) {
-      JTextField field = new JTextField(String.valueOf(value));
-      field.setEnabled(isCustomKernelEnabled);
-      kernelPanel.add(field);
+      SpinnerNumberModel valueModel = new SpinnerNumberModel(value, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
+          1);
+      JSpinner valueSpinner = new JSpinner(valueModel);
+      valueSpinner.setEnabled(isCustomKernelEnabled);
+      valueSpinner.addChangeListener(new ChangeListener() {
+        @Override
+        public void stateChanged(ChangeEvent e) {
+          if (isCustomKernelEnabled) {
+            float[] newData = new float[valueSpinners.size()];
+            for (int i = 0; i < newData.length; i++) {
+              newData[i] = ((Double) valueSpinners.get(i).getValue()).floatValue();
+            }
+            selectedKernel = new Kernel(validWidth, validWidth, newData);
+            displayKernel();
+          }
+        }
+      });
+      valueSpinners.add(valueSpinner);
+      kernelPanel.add(valueSpinner);
     }
 
     currentKernelPanel.add(kernelPanel);

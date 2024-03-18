@@ -1,6 +1,6 @@
 package com.urluur;
 
-import mpi.MPI;
+import mpi.*;
 import java.io.IOException;
 import java.awt.image.Kernel;
 import java.awt.image.BufferedImage;

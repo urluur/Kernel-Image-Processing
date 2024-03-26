@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Master",
+            "request": "launch",
+            "mainClass": "com.urluur.App",
+            "projectName": "kernel-image-processing",
+            "args": [
+                "0", // Master ID
+                "../conf/xdev.conf", // Config file location
+                "masterdev" // Device name
+            ],
+            "preLaunchTask": "maven-compile"
+        },
+        {
+            "type": "java",
+            "name": "Launch Worker",
+            "request": "launch",
+            "mainClass": "com.urluur.Distributed",
+            "projectName": "kernel-image-processing",
+            "args": [
+                "1", // Worker ID
+                "../conf/xdev.conf", // Config file location
+                "masterdev" // Device name
+            ],
+            "preLaunchTask": "maven-compile"
+        }
+    ]
+}

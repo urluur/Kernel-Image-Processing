@@ -9,10 +9,14 @@
             "projectName": "kernel-image-processing",
             "args": [
                 "0", // Master ID
-                "../conf/xdev.conf", // Config file location
-                "masterdev" // Device name
+                "/Users/urlu/Developer/repos/Kernel-Image-Processing/libs/mpj-v0_44/conf/xdev.conf", // Config file
+                "mxdev" // Device name
             ],
-            "preLaunchTask": "maven-compile"
+            "preLaunchTask": "maven-compile",
+            "env": {
+                "MPJ_HOME": "/Users/urlu/Developer/libraries/mpj-v0_44/",
+                "DEVICE": "mxdev"
+            }
         },
         {
             "type": "java",
@@ -22,10 +26,14 @@
             "projectName": "kernel-image-processing",
             "args": [
                 "1", // Worker ID
-                "../conf/xdev.conf", // Config file location
-                "masterdev" // Device name
+                "/Users/urlu/Developer/repos/Kernel-Image-Processing/libs/mpj-v0_44/conf/xdev.conf", // Config file
+                "mxdev" // Device name
             ],
-            "preLaunchTask": "maven-compile"
+            "preLaunchTask": "maven-compile",
+            "env": {
+                "MPJ_HOME": "/Users/urlu/Developer/libraries/mpj-v0_44/",
+                "DEVICE": "mxdev"
+            }
         }
     ]
 }

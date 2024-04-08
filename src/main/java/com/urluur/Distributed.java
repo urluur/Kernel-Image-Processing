@@ -14,15 +14,33 @@ public class Distributed {
     // method for the master computer
     Distributed.rank = App.getRank();
     Distributed.size = App.getSize();
+    // Convert image to byte array
+    byte[] imageBytes = null;
+    try {
+      imageBytes = ImageUtils.bufferedImageToByteArray(image, "png");
+    } catch (IOException e) {
+      e.printStackTrace();
+      MPI.Finalize();
+      return null;
+    }
+
+    // Convert Kernel to SerializableKernel
+    SerializableKernel serializableKernel = new SerializableKernel(kernel);
+
+    // Send the image and kernel to each worker
+    for (int i = 1; i < size; i++) {
+      Object[] buffer = new Object[] { imageBytes, serializableKernel };
+      MPI.COMM_WORLD.Send(buffer, 0, 2, MPI.OBJECT, i, 0);
+    }
+
     return applyKernelDistributed(image, kernel);
   }
 
-  public static void main(String[] args) {
+  public static void workerDistributed(String[] args) {
     // main method for the computers who are not masters
-    MPI.Init(args);
 
-    rank = MPI.COMM_WORLD.Rank();
-    size = MPI.COMM_WORLD.Size();
+    Distributed.rank = App.getRank();
+    Distributed.size = App.getSize();
 
     // receive the image and kernel from the master
     Object[] buffer = new Object[2];
@@ -36,7 +54,8 @@ public class Distributed {
       MPI.Finalize();
       return;
     }
-    Kernel kernel = (Kernel) buffer[1];
+    SerializableKernel serializableKernel = (SerializableKernel) buffer[1];
+    Kernel kernel = serializableKernel.toKernel();
 
     // Apply kernel to the image
     long startTime = System.currentTimeMillis();
@@ -44,7 +63,7 @@ public class Distributed {
     long endTime = System.currentTimeMillis();
     System.out.println("Rank: " + MPI.COMM_WORLD.Rank() + " done in: " + (endTime - startTime) + "ms");
 
-    MPI.Finalize();
+    // MPI.Finalize();
   }
 
   public static BufferedImage applyKernelDistributed(BufferedImage image, Kernel kernel) {
@@ -99,6 +118,7 @@ public class Distributed {
       }
       Object[] buffer = new Object[] { resultBytes };
       MPI.COMM_WORLD.Send(buffer, 0, 1, MPI.OBJECT, 0, 0);
+      System.out.println("Rank: " + rank + " sent result to master");
     }
 
     return result; // return final result

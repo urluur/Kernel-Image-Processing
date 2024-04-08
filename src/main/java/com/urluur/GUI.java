@@ -176,7 +176,7 @@ public class GUI {
     sequentialButton = new JButton("Sequential →");
     parallelButton = new JButton("Parallel →");
     distributedButton = new JButton("Distributed →");
-    distributedButton.setEnabled(false);
+    distributedButton.setEnabled(true); // TODO: debug
 
     // Set up ActionListener for Sequential button
     sequentialButton.addActionListener(new ActionListener() {

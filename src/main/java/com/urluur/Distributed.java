@@ -61,7 +61,7 @@ public class Distributed {
     long startTime = System.currentTimeMillis();
     applyKernelDistributed(image, kernel);
     long endTime = System.currentTimeMillis();
-    System.out.println("Rank: " + MPI.COMM_WORLD.Rank() + " done in: " + (endTime - startTime) + "ms");
+    System.out.println("Rank " + MPI.COMM_WORLD.Rank() + " done in " + (endTime - startTime) + "ms");
 
     // MPI.Finalize();
   }
@@ -118,7 +118,6 @@ public class Distributed {
       }
       Object[] buffer = new Object[] { resultBytes };
       MPI.COMM_WORLD.Send(buffer, 0, 1, MPI.OBJECT, 0, 0);
-      System.out.println("Rank: " + rank + " sent result to master");
     }
 
     return result; // return final result

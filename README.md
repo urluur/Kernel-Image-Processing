@@ -42,19 +42,16 @@ This process can take a lot of time if done sequentially, so we can use parallel
     ```sh
     mvn install:install-file -Dfile=libs/mpj-v0_44/lib/mpj.jar -DgroupId=com.googlecode.mpj-express -DartifactId=mpj-v0_44 -Dversion=0.44 -Dpackaging=jar
     ```
-
-## To-do:
-
-1. Running the program:
-  - [x] Sequential
-  - [x] Parallel
-  - [ ] Distributed
-  - [x] User can specify the input image.
-  - [x] The program measures run-time needed to complete.
-
-2. Problem specific implementation requirements
-  - [x] There should be a default kernel supplied
-  - [x] The implementation must adapt automatically to the hardware it is being ran on (Physical CPU's, Cores, Memory, etc..);
-  - [x] The project must include a few sample images of different sizes.
-  - [x] The user should be able to choose the kernel
-  - [x] The user can set a custom kernel with a GUI
+5. Add MPJ to path:
+    ```sh
+    export MPJ_HOME=libs/mpj-v0_44
+    export PATH=$MPJ_HOME/bin:$PATH
+    ```
+6. Compile the project:
+    ```sh
+    mvn clean install
+    ```
+7. Run the project:
+    ```sh
+    libs/mpj-v0_44/bin/mpjrun.sh -np 4 target/kernel-image-processing-1.0-SNAPSHOT.jar
+    ```

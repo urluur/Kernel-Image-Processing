@@ -9,17 +9,13 @@ import java.util.List;
 import java.awt.image.*;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
-import java.io.BufferedReader;
 import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import java.io.InputStreamReader;
 import java.awt.event.ActionEvent;
+import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
+import javax.swing.event.ChangeListener;
 import java.awt.datatransfer.DataFlavor;
 
 public class GUI {
@@ -67,12 +63,19 @@ public class GUI {
     }
   }
 
+  private void resetTimeLabels() {
+    sequentialTimeLabel.setText("Sequential: 0 ms");
+    parallelTimeLabel.setText("Parallel: 0 ms");
+    distributedTimeLabel.setText("Distributed: 0 ms");
+  }
+
   private void setupImageLabels() {
     originalImageLabel = new JLabel("Drag and drop image here...", SwingConstants.CENTER);
     processedImageLabel = new JLabel("Result:", SwingConstants.CENTER);
-    sequentialTimeLabel = new JLabel("Sequential: 0 ms");
-    parallelTimeLabel = new JLabel("Parallel: 0 ms");
-    distributedTimeLabel = new JLabel("Distributed: 0 ms");
+    sequentialTimeLabel = new JLabel();
+    parallelTimeLabel = new JLabel();
+    distributedTimeLabel = new JLabel();
+    resetTimeLabels();
     dimensionsLabel = new JLabel();
 
     updateDimensionsLabel();
@@ -147,9 +150,7 @@ public class GUI {
                 updateDimensionsLabel();
 
                 originalImageLabel.repaint();
-                sequentialTimeLabel.setText("Sequential: 0 ms");
-                parallelTimeLabel.setText("Parallel: 0 ms");
-                distributedTimeLabel.setText("Distributed: 0 ms");
+                resetTimeLabels();
 
                 processedImage = null;
                 processedImageLabel.repaint();
@@ -176,7 +177,6 @@ public class GUI {
     sequentialButton = new JButton("Sequential →");
     parallelButton = new JButton("Parallel →");
     distributedButton = new JButton("Distributed →");
-    distributedButton.setEnabled(true); // TODO: debug
 
     // Set up ActionListener for Sequential button
     sequentialButton.addActionListener(new ActionListener() {
@@ -270,6 +270,7 @@ public class GUI {
             long startTime = System.currentTimeMillis();
             BufferedImage result = Distributed.masterDistributed(originalImage, selectedKernel);
             long endTime = System.currentTimeMillis();
+            System.out.println("------");
             distributedTimeLabel.setText("Distributed: " + (endTime - startTime) + " ms");
             return result;
           }
@@ -307,9 +308,7 @@ public class GUI {
         originalImageLabel.setIcon(null);
         processedImageLabel.setIcon(null);
 
-        sequentialTimeLabel.setText("Sequential: 0 ms");
-        parallelTimeLabel.setText("Parallel: 0 ms");
-        distributedTimeLabel.setText("Distributed: 0 ms");
+        resetTimeLabels();
 
         originalImageLabel.repaint();
         processedImageLabel.repaint();
@@ -331,22 +330,16 @@ public class GUI {
   }
 
   private void setupDemoImages() {
-    // TODO: works in vscode, but not in jar
-    try (InputStream in = getClass().getResourceAsStream("/img");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+    // List of image files
+    List<String> imgFileNames = Arrays.asList(
+        "desetka.JPG",
+        "iceland.jpg",
+        "polar_bear.jpg",
+        "rockefeller_center.jpg",
+        "shanghai.jpg");
 
-      List<String> imgFileNames = new ArrayList<>();
-      String line;
-      while ((line = reader.readLine()) != null) {
-        if (line.toLowerCase().endsWith(".png") || line.toLowerCase().endsWith(".jpg")) {
-          imgFileNames.add(line);
-        }
-      }
-      // create a dropdown with images
-      demoImagesComboBox = new JComboBox<>(imgFileNames.toArray(new String[0]));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    // create a dropdown with images
+    demoImagesComboBox = new JComboBox<>(imgFileNames.toArray(new String[0]));
 
     demoImagesComboBox.insertItemAt("-- Demo images --", 0);
     demoImagesComboBox.setSelectedIndex(0);
@@ -362,7 +355,7 @@ public class GUI {
           SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
             @Override
             protected BufferedImage doInBackground() throws Exception {
-              InputStream is = getClass().getResourceAsStream("/img/" + selectedImageFileName);
+              InputStream is = getClass().getResourceAsStream("/images/" + selectedImageFileName);
               return ImageIO.read(is);
             }
 
@@ -373,9 +366,7 @@ public class GUI {
                 updateDimensionsLabel();
 
                 originalImageLabel.repaint();
-                sequentialTimeLabel.setText("Sequential: 0 ms");
-                parallelTimeLabel.setText("Parallel: 0 ms");
-                distributedTimeLabel.setText("Distributed: 0 ms");
+                resetTimeLabels();
 
                 processedImage = null;
                 processedImageLabel.repaint();

@@ -68,6 +68,5 @@ public class App {
         Distributed.workerDistributed(args);
       }
     }
-
   }
 }

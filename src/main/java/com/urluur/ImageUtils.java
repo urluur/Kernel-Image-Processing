@@ -95,5 +95,4 @@ public class ImageUtils {
     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
     return ImageIO.read(bais);
   }
-
 }

@@ -332,6 +332,9 @@ public class GUI {
   private void setupDemoImages() {
     // List of image files
     List<String> imgFileNames = Arrays.asList(
+        "coffee-S.jpg",
+        "coffee-M.jpg",
+        "coffee-L.jpg",
         "desetka.JPG",
         "iceland.jpg",
         "polar_bear.jpg",

@@ -1,6 +1,6 @@
 package com.urluur;
 
-import mpi.*;
+// import mpi.*;
 import java.awt.*;
 import javax.swing.*;
 import java.util.Map;
@@ -39,9 +39,9 @@ public class App {
   };
 
   public static void main(String[] args) {
-    MPI.Init(args);
-    rank = MPI.COMM_WORLD.Rank();
-    size = MPI.COMM_WORLD.Size();
+    // MPI.Init(args);
+    // rank = MPI.COMM_WORLD.Rank();
+    // size = MPI.COMM_WORLD.Size();
 
     if (rank == 0) {
       System.out.println("Master started");
@@ -58,14 +58,14 @@ public class App {
 
         frame.addWindowListener(new WindowAdapter() {
           public void windowClosing(WindowEvent e) {
-            MPI.Finalize();
+            // MPI.Finalize();
           }
         });
       });
     } else {
       System.out.println("Worker with rank " + rank + " started");
       while (true) {
-        Distributed.workerDistributed(args);
+        // Distributed.workerDistributed(args);
       }
     }
   }

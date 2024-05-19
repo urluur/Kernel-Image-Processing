@@ -3,10 +3,18 @@
 \usepackage[a4paper, margin=1in]{geometry}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
-\usepackage{lipsum}
+\usepackage[backend=bibtex,style=verbose-trad2]{biblatex}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{float}
+\usepackage{multicol}
+
+\addbibresource{references.bib}
 
 \title{Kernel Image Processing}
-\author{Luka Ursic \\ UP Famnit \\ E-mail: luka.urs@gmail.com}
+\author{Luka Uršič \\ 89221145 \\ UP Famnit \\ E-mail: 89221145@student.upr.si}
 \date{\today}
 
 \pagestyle{fancy}
@@ -14,7 +22,6 @@
 \rhead{\today}
 \lhead{Kernel Image Processing}
 \rfoot{Page \thepage}
-
 \titleformat{\section}
 {\normalfont\Large\bfseries}{\thesection}{1em}{}
 
@@ -24,7 +31,66 @@
 \thispagestyle{empty}
 
 \begin{abstract}
-    \lipsum[1]
+    In this paper, I present how to use kernel image processing to modify an image. I explain how kernel image processing works, how I implemented it, and the time results I obtained from running it sequentially, in parallel, and with distributed computing. I compare the results and conclude which method is the best for this specific task.
 \end{abstract}
+
+\begin{multicols}{2}
+
+    \section{Introduction}
+    An image kernel is a small matrix used to apply effects like the ones you might find in popular photo manipulation software, such as blurring, sharpening, outlining, or embossing. They're also used in machine learning for 'feature extraction', a technique for determining the most important portions of an image. In this context, the process is referred to more generally as "convolution".
+
+    \cite{setosa}
+
+    \section{Implementation}
+    I implemented Kernel Image Processing in Java and used the Swing and AWT libraries to display the images. I ran the program on a single machine and on a cluster of machines to compare the results. I measured the time it took to process the image and compared the results.
+
+    I created a class called ImageProcessor that contains the methods applyKernelToPixel, applyKernel, applyKernelSequential, and applyKernelParallel. The applyKernelToPixel method applies the kernel to a single pixel, the applyKernel method applies the kernel to the entire image, the applyKernelSequential method applies the kernel to the image sequentially, and the applyKernelParallel method applies the kernel to the image in parallel.
+
+    \begin{algorithm}[H]
+        \caption{Pseudocode for ImageProcessor.java}
+        \begin{algorithmic}[1]
+            \State \textbf{Class} ImageProcessor
+            \State \textbf{Function} applyKernelToPixel(image, kernel, result, x, y)
+            \For{each value in the kernel}
+            \State Multiply the corresponding pixel color by the kernel value
+            \State Add the result to r, g, b
+            \EndFor
+            \State Clamp r, g, b between 0 and 255
+            \State Set the pixel in the result image to the new color
+            \State \textbf{End Function}
+            \State
+            \State \textbf{Function} applyKernel(image, kernel)
+            \For{each pixel in the image}
+            \State Apply the kernel to the pixel
+            \EndFor
+            \State \textbf{End Function}
+            \State
+            \State \textbf{Function} applyKernelSequential(image, kernel)
+            \State Apply the kernel to the image
+            \State Return the result image
+            \State \textbf{End Function}
+            \State
+            \State \textbf{Function} applyKernelParallel(image, kernel)
+            \State Use a ForkJoinPool to apply the kernel to each pixel in parallel
+            \State Return the result image
+            \State \textbf{End Function}
+            \State \textbf{End Class}
+        \end{algorithmic}
+    \end{algorithm}
+
+    \newpage
+
+    \section{Results}
+
+    I tested the program on my computer in sequential mode and in parallel mode with three picures of different sizes. Results in sequential mode were following the number of pixels in the image. The results in parallel mode were faster than in sequential mode. The difference was significant. It noted speedups of up to 4x. What surprised me, is that the speedup was present with small and large images.
+
+    \noindent\includegraphics[width=\linewidth]{img/coffee_speedup.jpg}
+
+    \section{Conclusion}
+    \newpage
+
+\end{multicols}
+
+\printbibliography[heading=bibintoc, title={References}]
 
 \end{document}

@@ -32,3 +32,4 @@ replay_pid*
 /report/*
 !/report/report.tex
 !/report/report.pdf
+!/report/img

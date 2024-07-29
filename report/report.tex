@@ -46,6 +46,8 @@
 
     I created a class called ImageProcessor that contains the methods applyKernelToPixel, applyKernel, applyKernelSequential, and applyKernelParallel. The applyKernelToPixel method applies the kernel to a single pixel, the applyKernel method applies the kernel to the entire image, the applyKernelSequential method applies the kernel to the image sequentially, and the applyKernelParallel method applies the kernel to the image in parallel.
 
+    You can see the pseudocode for the class ImageProcessor in the following algorithm.
+
     \begin{algorithm}[H]
         \caption{Pseudocode for ImageProcessor.java}
         \begin{algorithmic}[1]
@@ -82,12 +84,26 @@
 
     \section{Results}
 
-    I tested the program on my computer in sequential mode and in parallel mode with three picures of different sizes. Results in sequential mode were following the number of pixels in the image. The results in parallel mode were faster than in sequential mode. The difference was significant. It noted speedups of up to 4x. What surprised me, is that the speedup was present with small and large images.
+    I tested the program on my computer in sequential mode and in parallel mode with three pictures of different sizes. Results in sequential mode were following the number of pixels in the image. The results in parallel mode were faster than in sequential mode. The difference was significant. It noted speedups of up to 4x. What surprised me is that the speedup was present with small and large images.
 
-    \noindent\includegraphics[width=\linewidth]{img/coffee_speedup.jpg}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{img/coffee_speedup.jpg}
+        \caption{Speedup comparison between sequential and parallel processing}
+        \label{fig:speedup}
+    \end{figure}
+
+    What was even more surprising to me is the fact that the distributed computing was slower than the parallel computing. I expected the distributed computing to be faster, but it was slower. The reason for this is that the overhead of sending the image to the other machines was too high.
 
     \section{Conclusion}
+
+    The results of my experiments show that parallel computing using a ForkJoinPool provides significant speedup compared to sequential processing. The speedup was observed for both small and large images, indicating that parallel processing is beneficial regardless of image size.
+
+    However, the distributed computing approach did not yield better performance compared to parallel computing. The overhead of sending the image to other machines outweighed the potential benefits of distributed processing.
+
     \newpage
+
+
 
 \end{multicols}
 

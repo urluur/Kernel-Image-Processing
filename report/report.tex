@@ -41,6 +41,24 @@
 
     \cite{setosa}
 
+    \section{Algorithm}
+
+    The program uses a kernel, which is essentially a small matrix that is applied to each pixel in the image. This kernel works by interacting with the pixel and its surrounding neighbors. The new value of the pixel is calculated through a process where the kernel is multiplied by the surrounding pixels, and the resulting values are summed up.
+
+    This technique is used in various image processing tasks, such as blurring, sharpening, edge detection, and more. By systematically applying the kernel across the entire image, the program can achieve the desired transformation or effect.
+
+    \cite{wikipedia}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{img/kernel.jpg}
+        \caption{Speedup comparison between sequential and parallel processing}
+        \label{fig:Kernel}
+    \end{figure}
+
+
+    This process is usualy done sequentially, pixel by pixel, row by row. Now imagine that we have a large image with millions of pixels. This process can take a long time. To speed up the process, we can use parallel computing. We can split the image into smaller parts and process them in parallel. This way, we can process the image much faster.
+
     \section{Implementation}
     I implemented Kernel Image Processing in Java and used the Swing and AWT libraries to display the images. I ran the program on a single machine and on a cluster of machines to compare the results. I measured the time it took to process the image and compared the results.
 
@@ -80,7 +98,8 @@
         \end{algorithmic}
     \end{algorithm}
 
-    \newpage
+    % pomoje ne bo new page
+    % \newpage
 
     \section{Results}
 

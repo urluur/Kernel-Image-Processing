@@ -54,13 +54,13 @@
 
     \subsection{Explanation}
 
-    To perform a convolution, the program uses a kernel that is applied to each pixel in the image. This kernel works by interacting with the pixel and its surrounding neighbors. The new value of the pixel is calculated through a process where the pixels are multiplied by the corresponding values in the kernel and then summed up. The result is then used as the new value of the pixel.
+    To perform a convolution, the program uses a kernel that is applied to each pixel in the image. This kernel works by interacting with the pixel and its surrounding neighbors. The value of the new pixel is calculated through a process where the pixels are multiplied by the corresponding values in the kernel and then summed up. The result is a pixel on a new image. The kernel is then moved to the next pixel. See figure \ref{fig:kernel} for a visual representation.
 
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{img/kernel.jpg}
         \caption{Convolution of an image with a kernel, illustrating how the output pixel value is calculated}
-        \label{fig:Kernel}
+        \label{fig:kernel}
     \end{figure}
 
     By systematically applying the kernel across the entire image, the program can achieve the desired transformation or effect, that can be used in image manipulation programs or machine learning algorithms.
@@ -74,7 +74,6 @@
 
     You can see the pseudocode for the class ImageProcessor in the following algorithm.
 
-    % // TODO: ni očitno, da convolution tvori nov pixel
     \begin{algorithm}[H]
         \caption{Pseudocode for ImageProcessor.java}
         \raggedright
@@ -130,7 +129,7 @@
         \centering
         \includegraphics[width=\linewidth]{img/parallel.jpg}
         \caption{Code for parallel processing that submits each pixel to the ForkJoinPool}
-        \label{fig:Parallel Code}
+        \label{fig:parallelcode}
     \end{figure}
 
     Later I implemented parallel mode that splits the image into smaller chunks and processes them in parallel. This way, the processing time is further reduced due to less overhead. Its implementation is a bit more complicated, but both are similar. I decided to keep both implementations, so the user can choose which mode to use.
@@ -170,8 +169,6 @@
         \item \textbf{MPI Version}: MPJ Express 0.44
     \end{itemize}
 
-    \vfill
-
     \section{Results}
 
     I tried running the program in sequential mode and in parallel mode with the demo picture of coffee of three different sizes. Results in sequential mode were following the number of pixels in the image. The results in parallel mode were much faster than in sequential mode.
@@ -188,8 +185,6 @@
     I was satisfied with the results of the parallel processing, compared to the very slow sequential approach. This proves the problem is really trivially parallel problem.
 
     However, operating system, processor temperature and other programs running in the background can affect the results.
-
-    \vfill
 
     \pagebreak
 

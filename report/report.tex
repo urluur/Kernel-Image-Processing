@@ -10,6 +10,7 @@
 \usepackage{algpseudocode}
 \usepackage{float}
 \usepackage{multicol}
+\usepackage{url}
 
 \addbibresource{references.bib}
 
@@ -43,24 +44,31 @@
 
     \section{Algorithm}
 
-    The program uses a kernel, which is essentially a small matrix that is applied to each pixel in the image. This kernel works by interacting with the pixel and its surrounding neighbors. The new value of the pixel is calculated through a process where the kernel is multiplied by the surrounding pixels, and the resulting values are summed up.
+    Here is the mathematical definition of the convolution of original image $f$, kernel $\omega$, and resulting image $g$:
 
-    This technique is used in various image processing tasks, such as blurring, sharpening, edge detection, and more. By systematically applying the kernel across the entire image, the program can achieve the desired transformation or effect.
+    \begin{equation}
+        g(x, y) = \omega * f(x, y) = \sum_{i=-a}^{a} \sum_{j=-b}^{b} \omega(i, j) f(x-i, y-j)
+    \end{equation}
 
     \cite{wikipedia}
+
+    \vfill
+
+    To perform a convolution, the program uses a kernel, which is essentially a small matrix that is applied to each pixel in the image. This kernel works by interacting with the pixel and its surrounding neighbors. The new value of the pixel is calculated through a process where the kernel is multiplied by the surrounding pixels, and the resulting values are summed up.
 
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{img/kernel.jpg}
-        \caption{Speedup comparison between sequential and parallel processing}
+        \caption{Convolution of an image with a kernel}
         \label{fig:Kernel}
     \end{figure}
 
+    This technique is used in various image processing tasks, such as blurring, sharpening, edge detection, and more. By systematically applying the kernel across the entire image, the program can achieve the desired transformation or effect, that can be used in image manipulation programs or machine learning algorithms.
 
     This process is usualy done sequentially, pixel by pixel, row by row. Now imagine that we have a large image with millions of pixels. This process can take a long time. To speed up the process, we can use parallel computing. We can split the image into smaller parts and process them in parallel. This way, we can process the image much faster.
 
     \section{Implementation}
-    I implemented Kernel Image Processing in Java and used the Swing and AWT libraries to display the images. I ran the program on a single machine and on a cluster of machines to compare the results. I measured the time it took to process the image and compared the results.
+    I implemented Kernel Image Processing in Java and used the Swing and AWT libraries to display the images.
 
     I created a class called ImageProcessor that contains the methods applyKernelToPixel, applyKernel, applyKernelSequential, and applyKernelParallel. The applyKernelToPixel method applies the kernel to a single pixel, the applyKernel method applies the kernel to the entire image, the applyKernelSequential method applies the kernel to the image sequentially, and the applyKernelParallel method applies the kernel to the image in parallel.
 
@@ -98,8 +106,27 @@
         \end{algorithmic}
     \end{algorithm}
 
-    % pomoje ne bo new page
-    % \newpage
+    \subsection{Sequential}
+
+    The applyKernelSequential method processes each pixel in the image one by one, row by row. This method is simple and easy to implement, but it can be slow for large images.
+
+    \subsection{Parallel}
+
+    The applyKernelParallel method applies the kernel to the image in parallel using a ForkJoinPool. This method splits the image into smaller parts and processes them in parallel. This approach can be much faster than the sequential method, especially for large images.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{img/parallel.jpg}
+        \caption{Code for parallel processing}
+        \label{fig:Parallel Code}
+    \end{figure}
+
+
+    % \subsection{Distributed}
+
+
+
+
 
     \section{Results}
 
@@ -119,10 +146,6 @@
     The results of my experiments show that parallel computing using a ForkJoinPool provides significant speedup compared to sequential processing. The speedup was observed for both small and large images, indicating that parallel processing is beneficial regardless of image size.
 
     However, the distributed computing approach did not yield better performance compared to parallel computing. The overhead of sending the image to other machines outweighed the potential benefits of distributed processing.
-
-    \newpage
-
-
 
 \end{multicols}
 

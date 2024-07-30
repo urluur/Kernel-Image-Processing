@@ -21,12 +21,12 @@ import java.awt.datatransfer.DataFlavor;
 public class GUI {
   private JLabel originalImageLabel, processedImageLabel;
   private JLabel dimensionsLabel;
-  private JLabel sequentialTimeLabel, parallelTimeLabel, distributedTimeLabel;
+  private JLabel sequentialTimeLabel, parallelPixelsTimeLabel, parallelBlocksTimeLabel, distributedTimeLabel;
 
   JPanel currentKernelPanel = new JPanel();
   private boolean isCustomKernelEnabled = false;
 
-  private JButton sequentialButton, parallelButton, distributedButton;
+  private JButton sequentialButton, parallelPixelsButton, parallelBlocksButton, distributedButton;
   private JButton resetButton;
   private JButton saveButton;
 
@@ -65,7 +65,8 @@ public class GUI {
 
   private void resetTimeLabels() {
     sequentialTimeLabel.setText("Sequential: 0 ms");
-    parallelTimeLabel.setText("Parallel: 0 ms");
+    parallelPixelsTimeLabel.setText("Parallel (pixels): 0 ms");
+    parallelBlocksTimeLabel.setText("Parallel (blocks): 0 ms");
     distributedTimeLabel.setText("Distributed: 0 ms");
   }
 
@@ -73,7 +74,8 @@ public class GUI {
     originalImageLabel = new JLabel("Drag and drop image here...", SwingConstants.CENTER);
     processedImageLabel = new JLabel("Result:", SwingConstants.CENTER);
     sequentialTimeLabel = new JLabel();
-    parallelTimeLabel = new JLabel();
+    parallelPixelsTimeLabel = new JLabel();
+    parallelBlocksTimeLabel = new JLabel();
     distributedTimeLabel = new JLabel();
     resetTimeLabels();
     dimensionsLabel = new JLabel();
@@ -86,7 +88,8 @@ public class GUI {
 
     // Add the border to the labels
     sequentialTimeLabel.setBorder(paddingBorder);
-    parallelTimeLabel.setBorder(paddingBorder);
+    parallelPixelsTimeLabel.setBorder(paddingBorder);
+    parallelBlocksTimeLabel.setBorder(paddingBorder);
     distributedTimeLabel.setBorder(paddingBorder);
 
     // Override paintComponent for image labels
@@ -175,7 +178,8 @@ public class GUI {
 
   private void setupButtons() {
     sequentialButton = new JButton("Sequential →");
-    parallelButton = new JButton("Parallel →");
+    parallelPixelsButton = new JButton("Parallel (pixels) →");
+    parallelBlocksButton = new JButton("Parallel (blocks) →");
     distributedButton = new JButton("Distributed →");
 
     // Set up ActionListener for Sequential button
@@ -217,7 +221,7 @@ public class GUI {
     });
 
     // Set up ActionListener for Parallel button
-    parallelButton.addActionListener(new ActionListener() {
+    parallelPixelsButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         if (originalImage == null) {
@@ -225,7 +229,7 @@ public class GUI {
           return;
         }
 
-        CustomDialog processing = new CustomDialog(frame, "Processing image in parallel...");
+        CustomDialog processing = new CustomDialog(frame, "Processing image pixels in parallel...");
 
         SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
           @Override
@@ -233,7 +237,45 @@ public class GUI {
             long startTime = System.currentTimeMillis();
             BufferedImage result = ImageProcessor.applyKernelParallel(originalImage, selectedKernel);
             long endTime = System.currentTimeMillis();
-            parallelTimeLabel.setText("Parallel: " + (endTime - startTime) + " ms");
+            parallelPixelsTimeLabel.setText("Parallel (pixels): " + (endTime - startTime) + " ms");
+            return result;
+          }
+
+          @Override
+          protected void done() {
+            try {
+              processedImage = get();
+              processedImageLabel.repaint();
+              processing.dispose();
+            } catch (Exception ex) {
+              ex.printStackTrace();
+            }
+          }
+        };
+
+        worker.execute();
+        processing.setVisible(true);
+      }
+    });
+
+    // Set up ActionListener for Parallel Blocks button
+    parallelBlocksButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (originalImage == null) {
+          JOptionPane.showMessageDialog(frame, "No image loaded", "Error", JOptionPane.ERROR_MESSAGE);
+          return;
+        }
+
+        CustomDialog processing = new CustomDialog(frame, "Processing image in parallel with blocks...");
+
+        SwingWorker<BufferedImage, Void> worker = new SwingWorker<>() {
+          @Override
+          protected BufferedImage doInBackground() throws Exception {
+            long startTime = System.currentTimeMillis();
+            BufferedImage result = ImageProcessor.applyKernelParallel(originalImage, selectedKernel);
+            long endTime = System.currentTimeMillis();
+            parallelBlocksTimeLabel.setText("Parallel (blocks): " + (endTime - startTime) + " ms");
             return result;
           }
 
@@ -295,7 +337,8 @@ public class GUI {
     // Set preferred size for buttons
     Dimension buttonSize = new Dimension(100, 40);
     sequentialButton.setPreferredSize(buttonSize);
-    parallelButton.setPreferredSize(buttonSize);
+    parallelPixelsButton.setPreferredSize(buttonSize);
+    parallelBlocksButton.setPreferredSize(buttonSize);
     distributedButton.setPreferredSize(buttonSize);
 
     resetButton = new JButton("Reset");
@@ -449,8 +492,11 @@ public class GUI {
     sequentialButton.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(sequentialButton);
 
-    parallelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-    buttonPanel.add(parallelButton);
+    parallelPixelsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+    buttonPanel.add(parallelPixelsButton);
+
+    parallelBlocksButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+    buttonPanel.add(parallelBlocksButton);
 
     distributedButton.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(distributedButton);
@@ -458,8 +504,11 @@ public class GUI {
     sequentialTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(sequentialTimeLabel);
 
-    parallelTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-    buttonPanel.add(parallelTimeLabel);
+    parallelPixelsTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    buttonPanel.add(parallelPixelsTimeLabel);
+
+    parallelBlocksTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    buttonPanel.add(parallelBlocksTimeLabel);
 
     distributedTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
     buttonPanel.add(distributedTimeLabel);

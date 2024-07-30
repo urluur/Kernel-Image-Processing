@@ -38,7 +38,7 @@
 \begin{multicols}{2}
 
     \section{Introduction}
-    An image kernel is a small matrix used to apply effects like the ones you might find in popular photo manipulation software, such as blurring, sharpening, outlining, or embossing. They're also used in machine learning for 'feature extraction', a technique for determining the most important portions of an image. In this context, the process is referred to more generally as "convolution".
+    An image kernel is a number matrix used to apply effects like the ones you might find in popular photo manipulation software, such as blurring, sharpening, outlining, or embossing. They're also used in machine learning for 'feature extraction', a technique for determining the most important portions of an image. In this context, the process is referred to more generally as "convolution".
 
     \cite{setosa}
 
@@ -54,18 +54,20 @@
 
     \vfill
 
-    To perform a convolution, the program uses a kernel, which is essentially a small matrix that is applied to each pixel in the image. This kernel works by interacting with the pixel and its surrounding neighbors. The new value of the pixel is calculated through a process where the kernel is multiplied by the surrounding pixels, and the resulting values are summed up.
+    To perform a convolution, the program uses a kernel that is applied to each pixel in the image. This kernel works by interacting with the pixel and its surrounding neighbors. The new value of the pixel is calculated through a process where the pixels are multiplied by the corresponding values in the kernel and then summed up. The result is then used as the new value of the pixel.
 
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{img/kernel.jpg}
-        \caption{Convolution of an image with a kernel}
+        \caption{Convolution of an image with a kernel, illustrating how the output pixel value is calculated}
         \label{fig:Kernel}
     \end{figure}
 
     This technique is used in various image processing tasks, such as blurring, sharpening, edge detection, and more. By systematically applying the kernel across the entire image, the program can achieve the desired transformation or effect, that can be used in image manipulation programs or machine learning algorithms.
 
-    This process is usualy done sequentially, pixel by pixel, row by row. Now imagine that we have a large image with millions of pixels. This process can take a long time. To speed up the process, we can use parallel computing. We can split the image into smaller parts and process them in parallel. This way, we can process the image much faster.
+
+    % // TODO: razloži da je problem trivially parallel in zakaj
+    This process can be done sequentially, pixel by pixel, row by row. Now imagine that we have a large image with millions of pixels. This process can take a long time. To speed up the process, we can use parallel computing. We can split the image into smaller parts and process them in parallel. This way, we can process the image much faster.
 
     \section{Implementation}
     I implemented Kernel Image Processing in Java and used the Swing and AWT libraries to display the images.
@@ -74,6 +76,7 @@
 
     You can see the pseudocode for the class ImageProcessor in the following algorithm.
 
+    % // TODO: ni očitno, da convolution tvori nov pixel
     \begin{algorithm}[H]
         \caption{Pseudocode for ImageProcessor.java}
         \begin{algorithmic}[1]
@@ -106,31 +109,68 @@
         \end{algorithmic}
     \end{algorithm}
 
-    \subsection{Sequential}
+    \subsection{Sequential implementation}
 
     The applyKernelSequential method processes each pixel in the image one by one, row by row. This method is simple and easy to implement, but it can be slow for large images.
 
-    \subsection{Parallel}
+    \subsection{Parallel implementation}
 
-    The applyKernelParallel method applies the kernel to the image in parallel using a ForkJoinPool. This method splits the image into smaller parts and processes them in parallel. This approach can be much faster than the sequential method, especially for large images.
+    % // TODO: zakaj si se odločil za ForkJoinPool
+
+    The applyKernelParallel method applies the kernel to the image in parallel using a ForkJoinPool that has threads corresponding to the number of computer processors. Then pixels are submitted to the pool and automatically asigned to any thread. This approach can be much faster than the sequential method, especially for large images.
+
+    Here is the code snippet for the parallel processing:
 
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{img/parallel.jpg}
-        \caption{Code for parallel processing}
+        \caption{Code for parallel processing that submits each pixel to the ForkJoinPool}
         \label{fig:Parallel Code}
     \end{figure}
 
+    I also implemented parallel mode that splits the image into smaller chunks and processes them in parallel. This way, the processing time is further reduced due to less overhead. Its implementation is a bit more complicated, but both are similar.
 
-    % \subsection{Distributed}
+    I tested both versions of parallel processing and decided to keep both implementations, so the user can choose which mode to use, because sometimes submitting each pixel to the pool can be faster than sequentially processing each chunk.
 
+    \subsection{Distributed implementation}
 
+    For distributed computing I used MPI (Message Passing Interface) in MPJ Express. I split the image into smaller parts and sent them to other machines for processing. The results were then sent back to the main machine and combined to form the final image.
 
+    \subsubsection{Key Methods}
 
+    \begin{itemize}
+        \item \texttt{masterDistributed}: This method sends the image and kernel to the workers, then processes one chunk of the image itself. It then receives the results from the workers and combines them to form the final image.
+
+        \item \texttt{workerDistributed}: This method receives the chunk of an image and kernel from the master, processes the chunk, and sends the results back to the master.
+
+        \item \texttt{applyKernelDistributed}: This method is used by master and workers to process a chunk of the image using the kernel.
+
+    \end{itemize}
+
+    \subsubsection{Performance Considerations}
+
+    While distributed computing can theoretically provide significant performance improvements, the actual performance gains depend on several factors:
+    \begin{itemize}
+        \item \textbf{Network Latency}: The time taken to send and receive chunks over the network can impact performance.
+        \item \textbf{Data Transfer Overhead}: Large images may incur significant overhead due to data transfer between machines.
+        \item \textbf{Synchronization}: Ensuring that all chunks are processed and combined correctly can introduce additional complexity and potential delays.
+    \end{itemize}
+
+    \section{Testing environment}
+
+    I tested the program on my laptop computer with the following specifications:
+
+    \begin{itemize}
+        \item \textbf{Processor}: Apple M1 chip (8 cores;\\4 performance cores, 4 efficiency cores)
+        \item \textbf{RAM}: 8 GB unified memory
+        \item \textbf{Operating System}: macOS Sonoma
+        \item \textbf{Java Version}: OpenJDK 22
+        \item \textbf{MPI Version}: MPJ Express 0.44
+    \end{itemize}
 
     \section{Results}
 
-    I tested the program on my computer in sequential mode and in parallel mode with three pictures of different sizes. Results in sequential mode were following the number of pixels in the image. The results in parallel mode were faster than in sequential mode. The difference was significant. It noted speedups of up to 4x. What surprised me is that the speedup was present with small and large images.
+    I tested the program in sequential mode and in parallel mode with the demo picture of coffee of different sizes. Results in sequential mode were following the number of pixels in the image. The results in parallel mode were faster than in sequential mode. The difference was significant. It noted speedups of up to 4x. What surprised me is that the speedup was present with small and large images.
 
     \begin{figure}[H]
         \centering
@@ -150,5 +190,8 @@
 \end{multicols}
 
 \printbibliography[heading=bibintoc, title={References}]
+
+% // TODO: reference in linki v IEEE formatu
+% // TODO: Dodaj reference na kakšen članek o konvoluciji oziroma parallel implementaciji kernel image processing
 
 \end{document}

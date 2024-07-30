@@ -109,4 +109,45 @@ public class ImageProcessor {
 
     return result;
   }
+
+  /**
+   * Apply the kernel to the image in parallel using blocks.
+   * 
+   * @param image  The image to apply the kernel to
+   * @param kernel The kernel to apply
+   * @return The image with the kernel applied in parallel
+   */
+  public static BufferedImage applyKernelParallelBlocks(BufferedImage image, Kernel kernel) {
+    int width = image.getWidth();
+    int height = image.getHeight();
+    BufferedImage result = new BufferedImage(width, height, image.getType());
+
+    final int BLOCK_SIZE = 32; // 32 because it is a common cache line size
+
+    try (ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors())) {
+      // number of blocks in both dimensions calculation
+      int numBlocksX = (width + BLOCK_SIZE - 1) / BLOCK_SIZE;
+      int numBlocksY = (height + BLOCK_SIZE - 1) / BLOCK_SIZE;
+
+      // each task is one block
+      pool.submit(() -> {
+        IntStream.range(0, numBlocksX * numBlocksY).parallel().forEach(blockIndex -> {
+          int blockX = blockIndex % numBlocksX;
+          int blockY = blockIndex / numBlocksX;
+          int startX = blockX * BLOCK_SIZE;
+          int startY = blockY * BLOCK_SIZE;
+          int endX = Math.min(startX + BLOCK_SIZE, width);
+          int endY = Math.min(startY + BLOCK_SIZE, height);
+
+          for (int y = startY; y < endY; y++) {
+            for (int x = startX; x < endX; x++) {
+              applyKernelToPixel(image, kernel, result, x, y);
+            }
+          }
+        });
+      }).join();
+    }
+
+    return result;
+  }
 }

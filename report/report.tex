@@ -3,7 +3,7 @@
 \usepackage[a4paper, margin=1in]{geometry}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
-\usepackage[backend=bibtex,style=verbose-trad2]{biblatex}
+\usepackage[backend=bibtex,style=ieee]{biblatex}
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{algorithm}
@@ -39,20 +39,20 @@
 
     \section{Introduction}
     An image kernel is a number matrix used to apply effects like the ones you might find in popular photo manipulation software, such as blurring, sharpening, outlining, or embossing. They're also used in machine learning for 'feature extraction', a technique for determining the most important portions of an image. In this context, the process is referred to more generally as "convolution".
-
     \cite{setosa}
 
-    \section{Algorithm}
+    \section{Convolution}
 
-    Here is the mathematical definition of the convolution of original image $f$, kernel $\omega$, and resulting image $g$:
+    \subsection{Definition}
+
+    Here is the mathematical definition of the convolution of original image $f(x, y)$, kernel $\omega$, and resulting image $g(x, y)$:
 
     \begin{equation}
         g(x, y) = \omega * f(x, y) = \sum_{i=-a}^{a} \sum_{j=-b}^{b} \omega(i, j) f(x-i, y-j)
     \end{equation}
-
     \cite{wikipedia}
 
-    \vfill
+    \subsection{Explanation}
 
     To perform a convolution, the program uses a kernel that is applied to each pixel in the image. This kernel works by interacting with the pixel and its surrounding neighbors. The new value of the pixel is calculated through a process where the pixels are multiplied by the corresponding values in the kernel and then summed up. The result is then used as the new value of the pixel.
 
@@ -70,39 +70,40 @@
     \section{Implementation}
     I implemented Kernel Image Processing in Java and used the Swing and AWT libraries to display the images.
 
-    I created a class called ImageProcessor that contains the methods applyKernelToPixel, applyKernel, applyKernelSequential, and applyKernelParallel. The applyKernelToPixel method applies the kernel to a single pixel, the applyKernel method applies the kernel to the entire image, the applyKernelSequential method applies the kernel to the image sequentially, and the applyKernelParallel method applies the kernel to the image in parallel.
+    I created a class called ImageProcessor that contains the methods applyKernelToPixel, applyKernelSequential, and applyKernelParallel. The applyKernelToPixel method applies the kernel to a single pixel, the applyKernelSequential method applies the kernel to the image sequentially, and the applyKernelParallel method applies the kernel to the image in parallel.
 
     You can see the pseudocode for the class ImageProcessor in the following algorithm.
 
     % // TODO: ni očitno, da convolution tvori nov pixel
     \begin{algorithm}[H]
         \caption{Pseudocode for ImageProcessor.java}
+        \raggedright
         \begin{algorithmic}[1]
             \State \textbf{Class} ImageProcessor
-            \State \textbf{Function} applyKernelToPixel(image, kernel, result, x, y)
-            \For{each value in the kernel}
-            \State Multiply the corresponding pixel color by the kernel value
-            \State Add the result to r, g, b
+            \State
+            \State \textbf{Function} applyKernelToPixel(origImg, kernel, newImg, x, y)
+            \State Initialize r, g, b to 0
+            \For{each value in kernel}
+            \State Add (origImg pixel \(*\) kernel value)
             \EndFor
-            \State Clamp r, g, b between 0 and 255
-            \State Set the pixel in the result image to the new color
+            \State Clamp r, g, b to [0, 255]
+            \State Set newImg at (x, y) to (r, g, b) to r, g, b
             \State \textbf{End Function}
             \State
-            \State \textbf{Function} applyKernel(image, kernel)
-            \For{each pixel in the image}
-            \State Apply the kernel to the pixel
+            \State \textbf{Function} applyKernelSequential(origImg, kernel)
+            \State Initialize newImg
+            \For{each pixel (x, y) in origImg}
+            \State Call applyKernelToPixel(origImg, kernel, newImg, x, y)
             \EndFor
+            \State \textbf{Return} newImg
             \State \textbf{End Function}
             \State
-            \State \textbf{Function} applyKernelSequential(image, kernel)
-            \State Apply the kernel to the image
-            \State Return the result image
+            \State \textbf{Function} applyKernelParallel(origImg, kernel)
+            \State Initialize newImg
+            \State Use ForkJoinPool to process pixels in parallel
+            \State \textbf{Return} newImg
             \State \textbf{End Function}
             \State
-            \State \textbf{Function} applyKernelParallel(image, kernel)
-            \State Use a ForkJoinPool to apply the kernel to each pixel in parallel
-            \State Return the result image
-            \State \textbf{End Function}
             \State \textbf{End Class}
         \end{algorithmic}
     \end{algorithm}
@@ -227,7 +228,6 @@
 
 \printbibliography[heading=bibintoc, title={References}]
 
-% // TODO: reference in linki v IEEE formatu
 % // TODO: Dodaj reference na kakšen članek o konvoluciji oziroma parallel implementaciji kernel image processing
 
 \end{document}

@@ -39,7 +39,7 @@
 \begin{multicols}{2}
 
     \section{Introduction}
-    An image kernel is a number matrix used to apply effects like the ones you might find in popular photo manipulation software, such as blurring, sharpening, outlining, or embossing. They're also used in machine learning for 'feature extraction', a technique for determining the most important portions of an image. In this context, the process is referred to more generally as "convolution".
+    An image kernel is a number matrix used to apply effects like the ones you might find in popular photo manipulation software, such as blurring, sharpening, outlining, or embossing. They're also used in machine learning for 'feature extraction', a technique for determining the most important portions of an image. In this context, the process is more generally referred to as "convolution".
     \cite{setosa}
 
     \section{Convolution}
@@ -116,7 +116,7 @@
 
     \subsection{Parallel implementation}
 
-    The applyKernelParallel method applies the kernel to the image in parallel using a ForkJoinPool that has threads corresponding to the number of computer processors. Then pixels are submitted to the pool and automatically asigned to any thread. I used ForkJoinPool because of these advantages:
+    The applyKernelParallel method applies the kernel to the image in parallel using a ForkJoinPool that has threads corresponding to the number of computer processors. Then pixels are submitted to the pool and automatically assigned to any thread. I used ForkJoinPool because of these advantages:
     \cite{gallardo2014java}
 
     \begin{itemize}
@@ -189,12 +189,12 @@
 
     I was satisfied with the results of the parallel processing, compared to the very slow sequential approach. This proves the problem is really trivially parallel problem.
 
-    However, operating system, processor temperature and other programs running in the background can affect the results.
+    However, operating system, processor temperature and other programs running in the background can decrease the performance, which can affect results.
 
     \pagebreak
 
     \subsection{Average measurements}
-    Because of the slightly inconsistent measurements, I decided to run the it 10 times and take the average. The results were consistent, and the speedup was still present. The average speedup was around 3.5x.
+    Because of the slightly inconsistent measurements, I decided to run it 10 times and take the average. The results were consistent, and the speedup was still present. The average speedup was around 3.5x.
 
     In the same way, I measured the average times of all implemented modes. The data is shown in the following table.
 

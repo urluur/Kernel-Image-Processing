@@ -32,7 +32,8 @@
 \thispagestyle{empty}
 
 \begin{abstract}
-    In this paper, I present how to use kernel image processing to modify an image. I explain how kernel image processing works, how I implemented it, and the time results I obtained from running it sequentially, in parallel, and with distributed computing. I compare the results and conclude which method is the best for this specific task.
+    In this paper, I present the use of kernel image processing to modify images. I explain the workings of kernel image processing, its implementation, and the results of sequential, parallel, and distributed computing methods. The performance comparisons indicate the most efficient method for this task.
+
 \end{abstract}
 
 \begin{multicols}{2}
@@ -45,12 +46,13 @@
 
     \subsection{Definition}
 
-    Here is the mathematical definition of the convolution of original image $f(x, y)$, kernel $\omega$, and resulting image $g(x, y)$:
+    Here is the mathematical definition of the convolution of original image $f(x, y)$, kernel $\omega$, with dimensions $a$ and $b$ and resulting image $g(x, y)$:
 
     \begin{equation}
         g(x, y) = \omega * f(x, y) = \sum_{i=-a}^{a} \sum_{j=-b}^{b} \omega(i, j) f(x-i, y-j)
     \end{equation}
-    \cite{wikipedia}
+    \cite{theodoridis2006pattern}
+
 
     \subsection{Explanation}
 
@@ -59,9 +61,10 @@
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{img/kernel.jpg}
-        \caption{Convolution of an image with a kernel, illustrating how the output pixel value is calculated}
+        \caption{Convolution of an image with a kernel, illustrating how the output pixel is calculated \cite{plotke2013animation}}
         \label{fig:kernel}
     \end{figure}
+
 
     By systematically applying the kernel across the entire image, the program can achieve the desired transformation or effect, that can be used in image manipulation programs or machine learning algorithms.
 
@@ -114,12 +117,14 @@
     \subsection{Parallel implementation}
 
     The applyKernelParallel method applies the kernel to the image in parallel using a ForkJoinPool that has threads corresponding to the number of computer processors. Then pixels are submitted to the pool and automatically asigned to any thread. I used ForkJoinPool because of these advantages:
+    \cite{gallardo2014java}
 
     \begin{itemize}
         \item \textbf{Work-Stealing Algorithm}: It  distributes tasks to idle threads for balanced workload.
         \item \textbf{Lower Overhead}: It reuses threads instead of creating new ones, reducing overhead.
         \item \textbf{Built-in Java Framework}: It is part of the Java standard library, making it easy to use.
     \end{itemize}
+
 
     \newblock
 
@@ -200,9 +205,9 @@
         \label{fig:modes}
     \end{figure}
 
-    I noticed that the time it took to process the image in distributed mode was slower than in sequential. This was surprising to me, as I expected distributed computing to be much faster, evem faster than parallel, but it turns out it was the slowest.
+    I noticed that processing the image in distributed mode was slower than in sequential mode. This was surprising, as I expected distributed computing to be much faster, even faster than parallel computing. However, it turned out to be the slowest. The distributed mode was actually very close to the sequential mode, so I compared the two in a graph.
 
-    The distributed mode was actually very close to sequential mode, so I compared the two in the graph. Both parallel versios were way ahead of the other two modes, but the tested images were not large enough to see any significant difference between the two parallel modes.
+    Both parallel versions were significantly faster than the other two modes. During testing, I did not notice any significant difference between the two parallel modes, even with much larger images.
 
     \begin{figure}[H]
         \centering
@@ -212,6 +217,7 @@
     \end{figure}
 
     The reason for distributed mode not reaching my expectations is that the overhead of sending the chunks of an image was too high.
+    \cite{mattheakis2013significantly}
 
     \section{Conclusion}
 
@@ -222,7 +228,5 @@
 \end{multicols}
 
 \printbibliography[heading=bibintoc, title={References}]
-
-% // TODO: Dodaj reference na kakšen članek o konvoluciji oziroma parallel implementaciji kernel image processing
 
 \end{document}

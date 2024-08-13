@@ -1,0 +1,17 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Clean install and Run MPJ KIP",
+            "type": "shell",
+            "command": "mvn clean install && libs/mpj-v0_44/bin/mpjrun.sh -np 4 target/kernel-image-processing-1.0-SNAPSHOT.jar",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

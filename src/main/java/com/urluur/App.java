@@ -41,7 +41,7 @@ public class App {
   /**
    * Main method starts the Kernel image processor application.
    * GUI is started on rank 0, workers start processing images without GUI.
-   * @param args
+   * @param args command line arguments
    */
   public static void main(String[] args) {
     MPI.Init(args);

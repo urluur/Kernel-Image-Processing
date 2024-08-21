@@ -98,7 +98,7 @@ public class Distributed {
    * Receives image chunk and kernel from master, processes the chunk, and
    * sends the processed chunk back to the master.
    * 
-   * @param args
+   * @param args command line arguments
    */
   public static void workerDistributed(String[] args) {
     Distributed.rank = App.getRank();

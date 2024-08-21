@@ -40,11 +40,20 @@ public class GUI {
   private JComboBox<String> demoImagesComboBox;
   private JComboBox<String> kernelsComboBox;
 
+  /**
+   * Constructor for GUI class.
+   * 
+   * @param frame   Main frame
+   * @param kernels Map of kernels
+   */
   public GUI(JFrame frame, Map<String, Kernel> kernels) {
     this.frame = frame;
     this.kernels = kernels;
   }
 
+  /**
+   * Full setup of the user interface.
+   */
   public void setupUI() {
     frame.setLayout(new BorderLayout());
     setupImageLabels();
@@ -55,6 +64,9 @@ public class GUI {
     setupPanels();
   }
 
+  /**
+   * Update the dimensions label with the dimensions of the original image.
+   */
   private void updateDimensionsLabel() {
     if (originalImage != null) {
       dimensionsLabel.setText("Dimensions: " + originalImage.getWidth() + "x" + originalImage.getHeight());
@@ -63,6 +75,9 @@ public class GUI {
     }
   }
 
+  /**
+   * Reset the time labels to 0 ms.
+   */
   private void resetTimeLabels() {
     sequentialTimeLabel.setText("Sequential: 0 ms");
     parallelPixelsTimeLabel.setText("Parallel (pixels): 0 ms");
@@ -70,6 +85,9 @@ public class GUI {
     distributedTimeLabel.setText("Distributed: 0 ms");
   }
 
+  /**
+   * Set up image labels.
+   */
   private void setupImageLabels() {
     originalImageLabel = new JLabel("Drag and drop image here...", SwingConstants.CENTER);
     processedImageLabel = new JLabel("Result:", SwingConstants.CENTER);
@@ -126,8 +144,10 @@ public class GUI {
     processedImageLabel.setHorizontalAlignment(JLabel.CENTER);
   }
 
+  /**
+   * Set up drag and drop functionality for the original image label.
+   */
   private void setupDragAndDrop() {
-    // Set up drag and drop functionality
     new DropTarget(originalImageLabel, new DropTargetAdapter() {
       @Override
       public void drop(DropTargetDropEvent dtde) {
@@ -176,6 +196,9 @@ public class GUI {
     });
   }
 
+  /**
+   * Sets up all buttons, their actions, and their preferred sizes.
+   */
   private void setupButtons() {
     sequentialButton = new JButton("Sequential →");
     parallelPixelsButton = new JButton("Parallel (pixels) →");
@@ -372,6 +395,9 @@ public class GUI {
     });
   }
 
+  /**
+   * Set up the dropdown with demo images from the resources folder.
+   */
   private void setupDemoImages() {
     // List of image files
     List<String> imgFileNames = Arrays.asList(
@@ -431,6 +457,9 @@ public class GUI {
     });
   }
 
+  /**
+   * Set up the dropdown with kernels from the kernels map.
+   */
   private void setupKernels() {
     String[] kernelNames = kernels.keySet().toArray(new String[0]); // get all kernels
     String[] kernelNamesWithCustom = Arrays.copyOf(kernelNames, kernelNames.length + 1);
@@ -455,6 +484,9 @@ public class GUI {
     });
   }
 
+  /**
+   * Set up the panels for the user interface.
+   */
   private void setupPanels() {
     // Set up layout for top panel
     JPanel topPanel = new JPanel(new BorderLayout());
@@ -532,6 +564,10 @@ public class GUI {
     frame.add(centerPanel, BorderLayout.CENTER);
   }
 
+  /**
+   * Display the current kernel in the GUI.
+   * It will display the kernel data and allow the user to change it if the custom kernel is enabled.
+   */
   private void displayKernel() {
     currentKernelPanel.removeAll();
     currentKernelPanel.setLayout(new BoxLayout(currentKernelPanel, BoxLayout.Y_AXIS));

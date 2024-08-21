@@ -49,6 +49,13 @@ public class ImageUtils {
     return resizedImg;
   }
 
+  /**
+   * Save the processed image to a file.
+   * User will be prompted to select the file location.
+   * 
+   * @param processedImage The processed image
+   * @param frame          The frame to display the dialog
+   */
   public static void saveImage(Image processedImage, JFrame frame) {
     if (processedImage == null) {
       JOptionPane.showMessageDialog(frame, "No processed image to save", "Error", JOptionPane.ERROR_MESSAGE);
@@ -84,7 +91,15 @@ public class ImageUtils {
     }
   }
 
-  // source: https://mkyong.com/java/how-to-convert-bufferedimage-to-byte-in-java/
+  /**
+   * Convert a BufferedImage to a byte array.
+   * source: https://mkyong.com/java/how-to-convert-bufferedimage-to-byte-in-java/
+   * 
+   * @param image BufferedImage to convert
+   * @param format Image format ("png", "jpg"...)
+   * @return Byte array of the image
+   * @throws IOException If an error occurs during conversion
+   */
   public static byte[] bufferedImageToByteArray(BufferedImage image, String format) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ImageIO.write(image, format, baos);

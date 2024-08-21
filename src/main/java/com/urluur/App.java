@@ -38,6 +38,11 @@ public class App {
     }
   };
 
+  /**
+   * Main method starts the Kernel image processor application.
+   * GUI is started on rank 0, workers start processing images without GUI.
+   * @param args
+   */
   public static void main(String[] args) {
     MPI.Init(args);
     rank = MPI.COMM_WORLD.Rank();

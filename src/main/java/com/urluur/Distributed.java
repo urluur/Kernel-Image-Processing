@@ -10,6 +10,15 @@ public class Distributed {
   private static int rank;
   private static int size;
 
+  /**
+   * Master method for distributed image processing.
+   * Sends image chunks and kernel to workers, processes its own chunk, and
+   * combines the results from workers.
+   * 
+   * @param image Image to process
+   * @param kernel Kernel to apply to the image
+   * @return Processed image
+   */
   public static BufferedImage masterDistributed(BufferedImage image, Kernel kernel) {
     Distributed.rank = App.getRank();
     Distributed.size = App.getSize();
@@ -20,18 +29,6 @@ public class Distributed {
     int width = image.getWidth();
     int height = image.getHeight();
     int chunkHeight = height / size;
-
-    // Master processes its chunk
-    BufferedImage masterChunk = image.getSubimage(0, 0, width, chunkHeight);
-    BufferedImage result = new BufferedImage(width, height, image.getType());
-    BufferedImage processedMasterChunk = applyKernelDistributed(masterChunk, kernel);
-
-    // Copy processed master chunk to the result
-    for (int y = 0; y < chunkHeight; y++) {
-      for (int x = 0; x < width; x++) {
-        result.setRGB(x, y, processedMasterChunk.getRGB(x, y));
-      }
-    }
 
     // Send each worker its chunk of the image and the kernel
     for (int i = 1; i < size; i++) {
@@ -51,6 +48,21 @@ public class Distributed {
       Object[] buffer = new Object[] { chunkBytes, serializableKernel };
       MPI.COMM_WORLD.Send(buffer, 0, 2, MPI.OBJECT, i, 0);
     }
+
+    // Master processes its chunk
+    long startTime = System.currentTimeMillis();
+    BufferedImage masterChunk = image.getSubimage(0, 0, width, chunkHeight);
+    BufferedImage result = new BufferedImage(width, height, image.getType());
+    BufferedImage processedMasterChunk = applyKernelDistributed(masterChunk, kernel);
+
+    // Copy processed master chunk to the result
+    for (int y = 0; y < chunkHeight; y++) {
+      for (int x = 0; x < width; x++) {
+        result.setRGB(x, y, processedMasterChunk.getRGB(x, y));
+      }
+    }
+    long endTime = System.currentTimeMillis();
+    System.out.println("Master done in " + (endTime - startTime) + "ms");
 
     // Combine results from workers
     for (int i = 1; i < size; i++) {
@@ -80,6 +92,14 @@ public class Distributed {
     return result;
   }
 
+
+  /**
+   * Worker method for distributed image processing.
+   * Receives image chunk and kernel from master, processes the chunk, and
+   * sends the processed chunk back to the master.
+   * 
+   * @param args
+   */
   public static void workerDistributed(String[] args) {
     Distributed.rank = App.getRank();
     Distributed.size = App.getSize();

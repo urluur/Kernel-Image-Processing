@@ -34,6 +34,10 @@ This process can take a lot of time if done sequentially, so we can use parallel
 
 ## Distributed computing setup (macOS/Linux)
 
+>[!important]
+>Code on this branch only works if MPI is set up in your environment.
+>Simplified non-distributed version is available on [no-mpi](https://github.com/urluur/Kernel-Image-Processing/tree/no-mpi) branch.
+
 1. Download MPJ Express v0.44 from [SourceForge](https://sourceforge.net/projects/mpjexpress/files/releases/mpj-v0_44.zip/download)
 2. Move to the project repository: `cd Kernel-Image-Processing/`
 2. Create libs folder: `mkdir libs`

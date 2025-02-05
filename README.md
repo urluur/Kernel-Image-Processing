@@ -2,7 +2,7 @@
 
 <img alt="Static Badge" src="https://img.shields.io/badge/Graphics-5a3aa1"> <img alt="Static Badge" src="https://img.shields.io/badge/Computing-0c4866">
 
-This project is a part of the course [Programming III](https://prog3.student.famnit.upr.si/) at [UP FAMNIT](https://www.famnit.upr.si/en/).
+This project was created as part of the [Programming III](https://prog3.student.famnit.upr.si/) course at [UP FAMNIT](https://www.famnit.upr.si/en/).
 
 It is a simple image processing program that uses a kernel to process the image. It is written in Java and uses [Swing](https://docs.oracle.com/javase/tutorial/uiswing/) for the GUI.
 

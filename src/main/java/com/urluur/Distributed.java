@@ -31,6 +31,7 @@ public class Distributed {
     int chunkHeight = height / size;
 
     // Send each worker its chunk of the image and the kernel
+    // TODO: broadcast the whole image to all workers
     for (int i = 1; i < size; i++) {
       int startY = i * chunkHeight;
       int endY = (i == size - 1) ? height : startY + chunkHeight;
